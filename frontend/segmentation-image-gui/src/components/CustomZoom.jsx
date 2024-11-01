@@ -1,20 +1,14 @@
-import { useState } from 'react';
-
-const CustomZoom = () => {
-    const [zoomLevel, setZoomLevel] = useState(1);
-    const handleZoomChange = (e) => {
-        setZoomLevel(e.target.value);
-    };
+const CustomZoom = ({ value, onChange }) => {
     return (
         <div className="">
             <input
                 type="range"
                 min="1"
                 max="10"
-                step="0.1"
+                step="0.5"
                 className="w-[400px]"
-                value={zoomLevel}
-                onChange={handleZoomChange}
+                value={value}
+                onChange={onChange}
             />
         </div>
     );
