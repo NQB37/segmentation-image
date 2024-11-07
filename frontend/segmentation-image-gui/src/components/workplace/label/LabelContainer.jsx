@@ -1,14 +1,22 @@
 import { useState } from 'react';
+import AddLabelModal from './AddLabelModal';
 
 const LabelContainer = ({ color, onChange }) => {
-    let labels = [
+    const [labels, setLabels] = useState([
         { id: '1', text: 'Foreground', color: '#ff0000' },
         { id: '2', text: 'Background', color: '#0000ff' },
-    ];
-    const [isOpened, setIsOpened] = useState(true);
+    ]);
+    const handleAddLabel = (id, title, color) => {
+        setLabels((prev) => [...prev, { id: id, text: title, color: color }]);
+        console.log(labels);
+    };
     return (
         <div>
-            <div className="px-4 py-2 font-bold">Label</div>
+            <div className="px-4 py-2 flex justify-between">
+                <div className="font-bold">Label</div>
+                <AddLabelModal handleAddLabel={handleAddLabel} />
+            </div>
+
             <div className="p-2 overflow-y-scroll border-t border-black hide-scrollbar space-y-2">
                 {labels.map((label) => {
                     return (
