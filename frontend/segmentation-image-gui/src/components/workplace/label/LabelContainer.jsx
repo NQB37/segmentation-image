@@ -1,23 +1,17 @@
 import { useState } from 'react';
 import AddLabelModal from './AddLabelModal';
+import { useCanvasContext } from '../../../hooks/useCanvasContext';
 
 const LabelContainer = ({ color, onChange }) => {
-    const [labels, setLabels] = useState([
-        { id: '1', text: 'Foreground', color: '#ff0000' },
-        { id: '2', text: 'Background', color: '#0000ff' },
-    ]);
-    const handleAddLabel = (id, title, color) => {
-        setLabels((prev) => [...prev, { id: id, text: title, color: color }]);
-        console.log(labels);
-    };
+    const { labels, handleAddLabel } = useCanvasContext();
     return (
         <div>
-            <div className="px-4 py-2 flex justify-between">
+            <div className="px-4 py-2 flex justify-between border-b border-black ">
                 <div className="font-bold">Label</div>
                 <AddLabelModal handleAddLabel={handleAddLabel} />
             </div>
 
-            <div className="p-2 overflow-y-scroll border-t border-black hide-scrollbar space-y-2">
+            <div className="p-2 overflow-y-scroll hide-scrollbar space-y-2">
                 {labels.map((label) => {
                     return (
                         <label

@@ -273,6 +273,7 @@ export const CanvasProvider = ({ children }) => {
         }
         ctx.putImageData(imageData, 0, 0);
     };
+
     // handle zoom
     const handleZoomChange = (e) => {
         const newScale = parseFloat(e.target.value);
@@ -318,6 +319,20 @@ export const CanvasProvider = ({ children }) => {
         setColor(e.target.value);
     };
 
+    // label
+    const [labels, setLabels] = useState([
+        { id: '1', text: 'Foreground', color: '#ff0000' },
+        { id: '2', text: 'Background', color: '#0000ff' },
+    ]);
+
+    const handleAddLabel = (id, title, color) => {
+        setLabels((prev) => [...prev, { id: id, text: title, color: color }]);
+        console.log(labels);
+    };
+
+    // segmentation
+    const runSegment = () => {};
+
     return (
         <CanvasContext.Provider
             value={{
@@ -339,6 +354,7 @@ export const CanvasProvider = ({ children }) => {
                 totalDrawnLength,
                 scale,
                 origin,
+                labels,
                 resetBtn,
                 handleUpload,
                 handleMove,
@@ -361,6 +377,7 @@ export const CanvasProvider = ({ children }) => {
                 handleCanvasClick,
                 handleClearCanvas,
                 handleColorChange,
+                handleAddLabel,
             }}
         >
             {children}
