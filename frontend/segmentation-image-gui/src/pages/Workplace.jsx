@@ -2,6 +2,7 @@ import LabelContainer from '../components/workplace/label/LabelContainer';
 import { useCanvasContext } from '../hooks/useCanvasContext';
 import ToolboxContainer from '../components/workplace/toolbox/ToolboxContainer';
 import CanvasContainer from '../components/workplace/canvas/CanvasContainer';
+import SegmentContainer from '../components/workplace/segmentation/SegmentContainer';
 
 const WorkplacePage = () => {
     const { color, handleColorChange } = useCanvasContext();
@@ -17,14 +18,18 @@ const WorkplacePage = () => {
                     {/* label/user field */}
                     <div className="w-1/6 border-l border-black">
                         {/* label */}
-                        <div className="h-1/2">
+                        <div className="h-1/3">
                             <LabelContainer
                                 color={color}
                                 onChange={handleColorChange}
                             />
                         </div>
+                        {/* segmentation */}
+                        <div className="h-1/3">
+                            <SegmentContainer />
+                        </div>
                         {/* user */}
-                        <div className="h-1/2"></div>
+                        <div className="h-1/3"></div>
                     </div>
                 </div>
             </div>

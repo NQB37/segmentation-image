@@ -1,15 +1,19 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useLogin } from '../hooks/useLogin';
+import { toast } from 'react-toastify';
 
 const LoginPage = () => {
     const navigate = useNavigate();
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-
-    const handleLogin = () => {
-        if (username == 'admin' && password == 'admin') {
-            console.log('test btn');
-            navigate('/');
+    const { login, error, isLoading } = useLogin();
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        await login(email, password);
+        if (error != null) {
+            toast.error(error);
+            return;
         }
     };
     return (
@@ -19,16 +23,17 @@ const LoginPage = () => {
                 <div className="mb-4">
                     <label
                         className="block text-gray-700 text-sm mb-2"
-                        htmlFor="username"
+                        htmlFor="email"
                     >
-                        Username
+                        Email
                     </label>
                     <input
                         className="w-full px-3 py-2 border border-gray-300 rounded"
                         type="text"
-                        id="username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        id="email"
+                        name="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                     />
                 </div>
                 <div className="mb-4">
@@ -42,6 +47,7 @@ const LoginPage = () => {
                         className="w-full px-3 py-2 border border-gray-300 rounded"
                         type="password"
                         id="password"
+                        name="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
