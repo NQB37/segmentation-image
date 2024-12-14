@@ -10,7 +10,7 @@ const BoardPage = () => {
     const { user } = useAuthContext();
     useEffect(() => {
         const fetchBoards = async () => {
-            const res = await fetch('http://localhost:3700/api/boardsRoute', {
+            const res = await fetch('http://localhost:3700/api/boardRoute', {
                 headers: { Authorization: `Bearer ${user.token}` },
             });
             const json = await res.json();

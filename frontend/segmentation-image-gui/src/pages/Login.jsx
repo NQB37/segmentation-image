@@ -15,6 +15,7 @@ const LoginPage = () => {
             toast.error(error);
             return;
         }
+        navigate('/board');
     };
     return (
         <div className="h-screen flex items-center justify-center bg-gradient-to-br from-blue-400 to-red-400">

@@ -18,15 +18,12 @@ const DeleteBoard = ({ _id }) => {
             toast.error('Must be logged in');
             return;
         }
-        const res = await fetch(
-            `http://localhost:3700/api/boardsRoute/${_id}`,
-            {
-                method: 'DELETE',
-                headers: {
-                    Authorization: `Bearer ${user.token}`,
-                },
+        const res = await fetch(`http://localhost:3700/api/boardRoute/${_id}`, {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${user.token}`,
             },
-        );
+        });
         const json = await res.json();
         if (!res.ok) {
             toast.error(json.error);
