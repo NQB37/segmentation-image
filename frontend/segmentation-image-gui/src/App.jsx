@@ -62,7 +62,12 @@ function App() {
                             !user ? <LoginPage /> : <Navigate to="/board" />
                         }
                     ></Route>
-                    <Route path="/signup" element={<SignupPage />}></Route>
+                    <Route
+                        path="/signup"
+                        element={
+                            !user ? <SignupPage /> : <Navigate to="/board" />
+                        }
+                    ></Route>
                 </Routes>
             </Router>
         </>

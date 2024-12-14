@@ -21,10 +21,10 @@ const NewBoard = () => {
     };
     const convertToBase64 = (e) => {
         const file = e.target.files[0];
-        const maxFileSize = 2 * 1024 * 1024;
-        if (file.size > maxFileSize) {
+        const maxFileSize = 10 * 1024 * 1024;
+        if (file.size >= maxFileSize) {
             toast.error(
-                'File size exceeds 2 MB. Please upload a smaller file.',
+                'File size exceeds 10 MB. Please upload a smaller file.',
             );
             return;
         }
@@ -43,13 +43,13 @@ const NewBoard = () => {
             toast.error('Must be logged in');
             return;
         }
-        if (!image || !title) {
-            toast.error('Please fill in all required fields');
+        if (!title || !image) {
+            toast.error('Please fill in all required fields (FE).');
             return;
         }
-        let ownerId = 'test';
+        let ownerId = 'temp';
         const board = { title: title, image: image, ownerId: ownerId };
-        const res = await fetch('http://localhost:3700/api/boardsRoute', {
+        const res = await fetch('http://localhost:3700/api/boardRoute', {
             method: 'POST',
             body: JSON.stringify(board),
             headers: {

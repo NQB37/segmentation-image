@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useSignUp } from '../hooks/useSignup';
 import LoadingIcon from '../components/Share/LoadingIcon';
 
 const SignupPage = () => {
+    const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -17,6 +18,7 @@ const SignupPage = () => {
             toast.error(error);
             return;
         }
+        navigate('/board');
     };
     return (
         <div className="h-screen flex items-center justify-center bg-gradient-to-br from-blue-400 to-red-400">

@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const getBoards = async (req, res) => {
     const ownerId = req.user._id;
     const boards = await Board.find({ ownerId }).sort({ createAt: -1 });
+    // const boards = await Board.find().sort({ createAt: -1 });
     res.status(200).json(boards);
 };
 // get board by id
@@ -33,7 +34,7 @@ const createBoard = async (req, res) => {
     }
     if (emptyFields.length > 0) {
         return res.status(400).json({
-            error: 'Please fill in all the required fields',
+            error: 'Please fill in all the required fields (BE).',
             emptyFields,
         });
     }
@@ -44,7 +45,7 @@ const createBoard = async (req, res) => {
             image,
             ownerId,
             labelsId,
-            user_id,
+            ownerId,
         });
         res.status(200).json(board);
     } catch (error) {
