@@ -4,7 +4,7 @@ const BtnGreen = ({ text, onClick, width }) => {
             onClick={onClick}
             className={`${
                 width ? width : 'w-full '
-            } h-11 px-2 border border-transparent bg-green-400 gap-0.5 hover:bg-green-500 transition duration-300`}
+            } h-11 px-2 border border-transparent bg-green-400 gap-0.5 rounded hover:bg-green-500 transition duration-300`}
         >
             {text}
         </button>

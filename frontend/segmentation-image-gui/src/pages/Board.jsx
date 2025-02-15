@@ -27,12 +27,12 @@ const BoardPage = () => {
         <div className="min-h-screen">
             <Header />
             <main className="p-8">
-                <div className="flex justify-between items-center mb-8">
+                <div className="flex justify-between items-center pb-4 mb-8 border-b border-black">
                     <h1 className="text-3xl font-bold">Project</h1>
                     <NewBoard />
                 </div>
                 <div className="h-full">
-                    {boards ? (
+                    {boards.length ? (
                         <div className="grid grid-cols-12 gap-4">
                             {boards.map((board) => {
                                 return (

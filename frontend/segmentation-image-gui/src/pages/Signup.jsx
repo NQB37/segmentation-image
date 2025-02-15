@@ -7,15 +7,29 @@ import LoadingIcon from '../components/Share/LoadingIcon';
 const SignupPage = () => {
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
+    const [name, setName] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const { signup, error, isLoading } = useSignUp();
 
-    const handleSignup = async (e) => {
-        e.preventDefault();
-        await signup(email, password, confirmPassword);
-        if (error != null) {
-            toast.error(error);
+    const handleEnter = (e) => {
+        if (e.key === 'Enter') {
+            handleSignup();
+        }
+    };
+
+    const handleSignup = async () => {
+        if (!email || !name || !password || !confirmPassword) {
+            toast.error('Please fill in all the required fields.');
+            return;
+        }
+        if (password !== confirmPassword) {
+            toast.error('Password is not match.');
+            return;
+        }
+        const res = await signup(email, name, password, confirmPassword);
+        if (res.error) {
+            toast.error(res.error);
             return;
         }
         navigate('/board');
@@ -38,6 +52,24 @@ const SignupPage = () => {
                         name="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        onKeyDown={handleEnter}
+                    />
+                </div>
+                <div className="mb-4">
+                    <label
+                        className="block text-gray-700 text-sm mb-2"
+                        htmlFor="username"
+                    >
+                        Name
+                    </label>
+                    <input
+                        className="w-full px-3 py-2 border border-gray-300 rounded"
+                        type="text"
+                        id="name"
+                        name="name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        onKeyDown={handleEnter}
                     />
                 </div>
                 <div className="mb-4">
@@ -54,6 +86,7 @@ const SignupPage = () => {
                         name="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        onKeyDown={handleEnter}
                     />
                 </div>
                 <div className="mb-4">
@@ -70,6 +103,7 @@ const SignupPage = () => {
                         name="confirmPassword"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
+                        onKeyDown={handleEnter}
                     />
                 </div>
                 <div className="mb-4">

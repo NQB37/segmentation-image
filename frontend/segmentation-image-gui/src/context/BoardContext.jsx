@@ -19,7 +19,7 @@ export const boardsReducer = (state, action) => {
     }
 };
 export const BoardContextProvider = ({ children }) => {
-    const [state, dispatch] = useReducer(boardsReducer, { boards: null });
+    const [state, dispatch] = useReducer(boardsReducer, { boards: [] });
     return (
         <BoardContext.Provider value={{ ...state, dispatch }}>
             {children}

@@ -4,15 +4,17 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const boardsRoute = require('./routes/boardRoute');
 const userRoute = require('./routes/userRoute');
+const inviteRoute = require('./routes/inviteRoute');
 
 //express app
 const app = express();
 const PORT_NUM = process.env.PORT;
 
 app.use(cors());
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '20mb' }));
 // middlewares
 app.use(express.json());
+
 app.use((req, res, next) => {
     console.log(req.path, req.method);
     next();
@@ -21,6 +23,7 @@ app.use((req, res, next) => {
 // routes
 app.use('/api/boardRoute', boardsRoute);
 app.use('/api/userRoute', userRoute);
+app.use('/api/inviteRoute', inviteRoute);
 
 // connect to db
 mongoose
@@ -34,5 +37,3 @@ mongoose
     .catch((error) => {
         console.log(error);
     });
-
-// listen for requests

@@ -19,9 +19,10 @@ const NewBoard = () => {
         setTitle('');
         setImage('');
     };
+
     const convertToBase64 = (e) => {
         const file = e.target.files[0];
-        const maxFileSize = 10 * 1024 * 1024;
+        const maxFileSize = 20 * 1024 * 1024;
         if (file.size >= maxFileSize) {
             toast.error(
                 'File size exceeds 10 MB. Please upload a smaller file.',
@@ -37,6 +38,7 @@ const NewBoard = () => {
             console.log('Error: ', error);
         };
     };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!user) {
@@ -150,7 +152,7 @@ const NewBoard = () => {
                         {/* footer */}
                         <div className="p-6 flex gap-6">
                             <BtnGray
-                                text="Cancle"
+                                text="Cancel"
                                 onClick={toggleModal}
                                 width=""
                             />

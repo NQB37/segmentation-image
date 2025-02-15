@@ -1,5 +1,6 @@
 const Board = require('../models/boardModel');
 const mongoose = require('mongoose');
+
 // get all boards
 const getBoards = async (req, res) => {
     const ownerId = req.user._id;
@@ -7,6 +8,7 @@ const getBoards = async (req, res) => {
     // const boards = await Board.find().sort({ createAt: -1 });
     res.status(200).json(boards);
 };
+
 // get board by id
 const getBoardById = async (req, res) => {
     const { id } = req.params;
@@ -19,6 +21,7 @@ const getBoardById = async (req, res) => {
     }
     res.status(200).json(board);
 };
+
 // create a new board
 const createBoard = async (req, res) => {
     const { title, ownerId, membersId, labelsId, image } = req.body;
@@ -52,6 +55,7 @@ const createBoard = async (req, res) => {
         res.status(404).json({ error: error.message });
     }
 };
+
 // update board
 const updateBoard = async (req, res) => {
     const { id } = req.params;
@@ -79,6 +83,7 @@ const deleteBoard = async (req, res) => {
     }
     res.status(200).json(board);
 };
+
 module.exports = {
     getBoards,
     getBoardById,
