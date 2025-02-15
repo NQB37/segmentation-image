@@ -6,7 +6,7 @@ export const useLogin = () => {
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const { dispatch } = useAuthContext();
-    const login = async (email, password, confirmPassword) => {
+    const login = async (email, password) => {
         setIsLoading(true);
         setError(null);
         const res = await fetch('http://localhost:3700/api/userRoute/login', {
@@ -18,14 +18,15 @@ export const useLogin = () => {
         if (!res.ok) {
             setIsLoading(false);
             setError(json.error);
-        }
-        if (res.ok) {
+            return { error: json.error };
+        } else {
             // save user
             localStorage.setItem('user', JSON.stringify(json));
             // update auth
             dispatch({ type: 'LOGIN', payload: json });
             setIsLoading(false);
             toast.success('Login successfully.');
+            return { success: true };
         }
     };
     return { login, isLoading, error };

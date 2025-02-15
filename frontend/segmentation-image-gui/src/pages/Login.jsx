@@ -7,12 +7,22 @@ const LoginPage = () => {
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const { login, error, isLoading } = useLogin();
-    const handleLogin = async (e) => {
-        e.preventDefault();
-        await login(email, password);
-        if (error != null) {
-            toast.error(error);
+    const { login, isLoading, error } = useLogin();
+
+    const handleEnter = (e) => {
+        if (e.key === 'Enter') {
+            handleLogin();
+        }
+    };
+
+    const handleLogin = async () => {
+        if (!email || !password) {
+            toast.error('Please fill in all the required fields.');
+            return;
+        }
+        const res = await login(email, password);
+        if (res.error) {
+            toast.error(res.error);
             return;
         }
         navigate('/board');
@@ -35,6 +45,7 @@ const LoginPage = () => {
                         name="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        onKeyDown={handleEnter}
                     />
                 </div>
                 <div className="mb-4">
@@ -51,6 +62,7 @@ const LoginPage = () => {
                         name="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        onKeyDown={handleEnter}
                     />
                 </div>
                 <div className="mb-4">
