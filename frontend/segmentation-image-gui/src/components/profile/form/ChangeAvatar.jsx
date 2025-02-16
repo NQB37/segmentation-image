@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { toast } from 'react-toastify';
 import BtnGray from '../../Share/BtnGray';
 import BtnGreen from '../../Share/BtnGreen';
+import { useAuthContext } from '../../../hooks/useAuthContext';
 
 const ChangeAvatar = () => {
+    const { user } = useAuthContext();
     const [image, setImage] = useState('');
     const [isModalOpened, setIsModalOpened] = useState(false);
     const toggleModal = () => {
@@ -29,12 +31,46 @@ const ChangeAvatar = () => {
         };
         reader.onerror = (error) => {
             console.log('Error: ', error);
+            toast.error('Failed to read file. Please try again.');
         };
     };
     const handleSubmit = async () => {
         if (!image) {
             toast.error('You have not choose image yet.');
             return;
+        }
+        try {
+            const response = await fetch(
+                'http://localhost:3700/api/userRoute/change-avatar',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${user.token}`,
+                    },
+                    body: JSON.stringify({ image }),
+                },
+            );
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(
+                    errorData.message ||
+                        'Failed to update image. Please try again.',
+                );
+            }
+
+            const data = await response.json();
+            toast.success(
+                data.message || 'Profile image updated successfully.',
+            );
+            toggleModal();
+            window.location.reload();
+        } catch (error) {
+            console.error('Error updating profile image:', error);
+            toast.error(
+                error.message || 'Failed to update image. Please try again.',
+            );
         }
     };
     return (

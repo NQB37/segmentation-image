@@ -6,6 +6,7 @@ const {
     changeAvatar,
     changePassword,
     getUserById,
+    changeInfo,
 } = require('../controllers/userController');
 const router = express.Router();
 
@@ -25,6 +26,9 @@ router.get('/profile', getUserById);
 router.post('/change-avatar', changeAvatar);
 
 // change password
-router.patch('/change-avatar', changePassword);
+router.patch('/change-password', changePassword);
+
+// change info
+router.patch('/change-info', changeInfo);
 
 module.exports = router;

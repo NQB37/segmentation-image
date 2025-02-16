@@ -13,11 +13,11 @@ const getBoards = async (req, res) => {
 const getBoardById = async (req, res) => {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(404).json({ error: 'Board not exists' });
+        return res.status(404).json({ error: 'Board not exists.' });
     }
     const board = await Board.findById(id);
     if (!board) {
-        return res.status(404).json({ error: 'Board not exists' });
+        return res.status(404).json({ error: 'Board not exists.' });
     }
     res.status(200).json(board);
 };
@@ -60,11 +60,11 @@ const createBoard = async (req, res) => {
 const updateBoard = async (req, res) => {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(404).json({ error: 'Board not exists' });
+        return res.status(404).json({ error: 'Board not exists.' });
     }
     const board = await Board.findOneAndUpdate({ _id: id }, { ...req.body });
     if (!board) {
-        return res.status(404).json({ error: 'Board not exists' });
+        return res.status(404).json({ error: 'Board not exists.' });
     }
     res.status(200).json(board);
 };
@@ -73,13 +73,13 @@ const updateBoard = async (req, res) => {
 const deleteBoard = async (req, res) => {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(404).json({ error: 'Board not exists' });
+        return res.status(404).json({ error: 'Board not exists.' });
     }
     const board = await Board.findOneAndDelete({ _id: id }).sort({
         createAt: -1,
     });
     if (!board) {
-        return res.status(404).json({ error: 'Board not exists' });
+        return res.status(404).json({ error: 'Board not exists.' });
     }
     res.status(200).json(board);
 };

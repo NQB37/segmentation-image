@@ -2,8 +2,11 @@ import { useState } from 'react';
 import { toast } from 'react-toastify';
 import BtnGray from '../../Share/BtnGray';
 import BtnGreen from '../../Share/BtnGreen';
+import axios from 'axios';
+import { useAuthContext } from '../../../hooks/useAuthContext';
 
 const ChangePassword = () => {
+    const { user } = useAuthContext();
     const [isModalOpened, setIsModalOpened] = useState(false);
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
@@ -27,6 +30,25 @@ const ChangePassword = () => {
         if (newPassword !== confirmPassword) {
             toast.error('Password is not match.');
             return;
+        }
+
+        const newInfo = { currentPassword, newPassword, confirmPassword };
+
+        try {
+            const res = await axios.patch(
+                'http://localhost:3700/api/userRoute/change-password',
+                newInfo,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${user.token}`,
+                    },
+                },
+            );
+            toggleModal();
+            toast.success('Change password successfully.');
+        } catch (error) {
+            toast.error(error.response?.data?.error || 'An error occurred');
         }
     };
     return (
@@ -60,7 +82,7 @@ const ChangePassword = () => {
                                     Current Password:
                                 </label>
                                 <input
-                                    type="text"
+                                    type="password"
                                     name="currentPassword"
                                     id="currentPassword"
                                     value={currentPassword}
@@ -78,7 +100,7 @@ const ChangePassword = () => {
                                     New Password:
                                 </label>
                                 <input
-                                    type="text"
+                                    type="password"
                                     name="newPassword"
                                     id="newPassword"
                                     value={newPassword}
@@ -96,7 +118,7 @@ const ChangePassword = () => {
                                     Confirm Password:
                                 </label>
                                 <input
-                                    type="text"
+                                    type="password"
                                     name="confirmPassword"
                                     id="confirmPassword"
                                     value={confirmPassword}
