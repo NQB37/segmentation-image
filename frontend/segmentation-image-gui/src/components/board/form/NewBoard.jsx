@@ -4,6 +4,7 @@ import BtnGray from '../../Share/BtnGray';
 import { toast } from 'react-toastify';
 import { useBoardContext } from '../../../hooks/useBoardContext';
 import { useAuthContext } from '../../../hooks/useAuthContext';
+import axios from 'axios';
 
 const NewBoard = () => {
     const { dispatch } = useBoardContext();
@@ -39,8 +40,7 @@ const NewBoard = () => {
         };
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleSubmit = async () => {
         if (!user) {
             toast.error('Must be logged in');
             return;
@@ -49,25 +49,27 @@ const NewBoard = () => {
             toast.error('Please fill in all required fields (FE).');
             return;
         }
+
         let ownerId = 'temp';
-        const board = { title: title, image: image, ownerId: ownerId };
-        const res = await fetch('http://localhost:3700/api/boardRoute', {
-            method: 'POST',
-            body: JSON.stringify(board),
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${user.token}`,
-            },
-        });
-        const json = await res.json();
-        if (!res.ok) {
-            toast.error(json.error);
-            console.log(json.error);
-        }
-        if (res.ok) {
+        const board = { title, image, ownerId };
+
+        try {
+            const res = await axios.post(
+                'http://localhost:3700/api/boardRoute',
+                board,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${user.token}`,
+                    },
+                },
+            );
+
             toggleModal();
-            dispatch({ type: 'CREATE_BOARD', payload: json });
+            dispatch({ type: 'CREATE_BOARD', payload: res.data });
             toast.success('Create new project successfully.');
+        } catch (error) {
+            toast.error(error.response?.data?.error || 'An error occurred');
         }
     };
     return (

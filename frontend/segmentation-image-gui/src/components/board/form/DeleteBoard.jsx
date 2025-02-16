@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { useBoardContext } from '../../../hooks/useBoardContext';
 import BtnRed from '../../Share/BtnRed';
 import { useAuthContext } from '../../../hooks/useAuthContext';
+import axios from 'axios';
 
 const DeleteBoard = ({ _id }) => {
     const { dispatch } = useBoardContext();
@@ -18,20 +19,20 @@ const DeleteBoard = ({ _id }) => {
             toast.error('Must be logged in');
             return;
         }
-        const res = await fetch(`http://localhost:3700/api/boardRoute/${_id}`, {
-            method: 'DELETE',
-            headers: {
-                Authorization: `Bearer ${user.token}`,
-            },
-        });
-        const json = await res.json();
-        if (!res.ok) {
-            toast.error(json.error);
-        }
-        if (res.ok) {
+        try {
+            const res = await axios.delete(
+                `http://localhost:3700/api/boardRoute/${_id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${user.token}`,
+                    },
+                },
+            );
             toggleModal();
-            dispatch({ type: 'DELETE_BOARD', payload: json });
+            dispatch({ type: 'DELETE_BOARD', payload: res.data });
             toast.success('Delete project successfully.');
+        } catch (error) {
+            toast.error(error.response?.data?.error || 'An error occurred');
         }
     };
     return (

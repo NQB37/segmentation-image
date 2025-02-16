@@ -34,9 +34,9 @@ const loginUser = async (req, res) => {
 // signup user
 const signupUser = async (req, res) => {
     const { email, name, password, confirmPassword } = req.body;
+    const baseAvatar =
+        'https://cdn.iconscout.com/icon/free/png-256/free-user-icon-download-in-svg-png-gif-file-formats--avatar-person-profile-ui-basic-pack-interface-icons-2082543.png';
     try {
-        const baseAvatar =
-            'https://cdn.iconscout.com/icon/free/png-256/free-user-icon-download-in-svg-png-gif-file-formats--avatar-person-profile-ui-basic-pack-interface-icons-2082543.png';
         if (!email || !name || !password || !confirmPassword) {
             throw Error('Please fill in all the required fields.');
         }
@@ -63,7 +63,7 @@ const signupUser = async (req, res) => {
         });
         // create token
         const token = createToken(user._id);
-        res.status(200).json({ email, name, token, baseAvatar });
+        res.status(200).json({ email, name, baseAvatar, token });
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
@@ -78,12 +78,110 @@ const getUserById = async (req, res) => {
 
 // change avatar
 const changeAvatar = async (req, res) => {
-    const { image } = req.body;
+    try {
+        const { image } = req.body;
+        if (!image) {
+            throw Error('Image is required.');
+        }
+
+        // check user valid
+        const user = await User.findById(req.user?._id);
+        if (!user) {
+            throw Error('User not found.');
+        }
+
+        // update password
+        const newInfo = await User.findByIdAndUpdate(
+            req.user?._id,
+            {
+                avatar: image,
+            },
+            { new: true },
+        );
+
+        res.status(200).json({
+            message: 'Profile image updated successfully.',
+        });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
 };
 
 // change password
 const changePassword = async (req, res) => {
     const { currentPassword, newPassword, confirmPassword } = req.body;
+    try {
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            throw Error('Please fill in all the required fields.');
+        }
+
+        // check user valid
+        const user = await User.findById(req.user?._id);
+        if (!user) {
+            throw Error('User not found.');
+        }
+
+        // validate
+        // compare current password with db password
+        const validPassword = await bcrypt.compare(
+            currentPassword,
+            user.password,
+        );
+        if (!validPassword) {
+            throw Error('User not found.');
+        }
+        // check password match
+        if (newPassword !== confirmPassword) {
+            throw Error('Password is not match.');
+        }
+        // check strong password
+        if (!validator.isStrongPassword(newPassword)) {
+            throw Error('Password not strong enough.');
+        }
+        // hash new pass
+        const salt = await bcrypt.genSalt(10);
+        const hash = await bcrypt.hash(newPassword, salt);
+
+        // update password
+        const newInfo = await User.findByIdAndUpdate(
+            req.user?._id,
+            {
+                password: hash,
+            },
+            { new: true },
+        );
+        res.status(200).json({ message: 'Change password success.' });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+
+// change info
+const changeInfo = async (req, res) => {
+    const { name } = req.body;
+    try {
+        if (!name) {
+            throw Error('Please fill in all the required fields.');
+        }
+
+        // check user valid
+        const user = await User.findById(req.user?._id);
+        if (!user) {
+            throw Error('User not found.');
+        }
+
+        // update password
+        const newInfo = await User.findByIdAndUpdate(
+            req.user?._id,
+            {
+                name: name,
+            },
+            { new: true },
+        );
+        res.status(200).json({ message: 'Change infomation successfully.' });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
 };
 
 module.exports = {
@@ -92,4 +190,5 @@ module.exports = {
     getUserById,
     changeAvatar,
     changePassword,
+    changeInfo,
 };

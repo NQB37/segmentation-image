@@ -1,13 +1,60 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Header from '../components/Share/Header';
 import ChangePassword from '../components/profile/form/ChangePassword';
 import ChangeAvatar from '../components/profile/form/ChangeAvatar';
+import axios from 'axios';
+import { useAuthContext } from '../hooks/useAuthContext';
+import { toast } from 'react-toastify';
 
 const ProfilePage = () => {
+    const { user } = useAuthContext();
     const [email, setEmail] = useState('');
     const [name, setName] = useState('');
+    const [avatar, setAvatar] = useState('');
 
-    const handleChangeName = () => {};
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const res = await axios.get(
+                    'http://localhost:3700/api/userRoute/profile',
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${user.token}`,
+                        },
+                    },
+                );
+                setEmail(res.data.email);
+                setName(res.data.name);
+                setAvatar(res.data.avatar);
+            } catch (error) {
+                toast.error(error.response?.data?.error || 'An error occurred');
+            }
+        };
+        fetchUserData();
+    }, []);
+
+    const handleChangeName = async () => {
+        if (!name) {
+            toast.error('Please fill in all the required fields.');
+            return;
+        }
+        try {
+            const res = await axios.patch(
+                'http://localhost:3700/api/userRoute/change-info',
+                { name: name },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${user.token}`,
+                    },
+                },
+            );
+            toast.success('Change name successfully.');
+        } catch (error) {
+            toast.error(error.response?.data?.error || 'An error occurred');
+        }
+    };
     return (
         <div>
             <Header />
@@ -17,7 +64,7 @@ const ProfilePage = () => {
                     {/* image  */}
                     <div className="relative">
                         <img
-                            src=""
+                            src={avatar}
                             alt="user_avatar"
                             className="rounded-full size-32 border border-black object-cover object-center"
                         />
@@ -27,10 +74,8 @@ const ProfilePage = () => {
                     <div className="pl-4 border-l border-black flex flex-col gap-2 justify-center">
                         <div className="py-4 flex flex-col gap- justify-center gap-2 border-b border-black">
                             <div className="w-full flex items-center gap-2">
-                                <label htmlFor="email" className="">
-                                    Email:{' '}
-                                </label>
-                                <p>Test email</p>
+                                <p className="">Email: </p>
+                                <p>{email}</p>
                             </div>
                             <div className="w-full flex items-center gap-2">
                                 <label htmlFor="displayName" className="">
@@ -40,11 +85,15 @@ const ProfilePage = () => {
                                     type="text"
                                     name="displayName"
                                     id="displayName"
-                                    value=""
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
                                     className="w-80 px-3 py-2 border border-black rounded"
                                 />
                             </div>
-                            <button className="w-fit bg-blue-500 text-white px-8 py-2 rounded hover:bg-blue-600">
+                            <button
+                                onClick={handleChangeName}
+                                className="w-fit bg-blue-500 text-white px-8 py-2 rounded hover:bg-blue-600"
+                            >
                                 Save
                             </button>
                         </div>
