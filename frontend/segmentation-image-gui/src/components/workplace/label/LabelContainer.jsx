@@ -1,6 +1,6 @@
-import { useState } from 'react';
 import AddLabelModal from './AddLabelModal';
 import { useCanvasContext } from '../../../hooks/useCanvasContext';
+import BtnVisible from '../BtnVisible';
 
 const LabelContainer = ({ color, onChange }) => {
     const { labels, handleAddLabel } = useCanvasContext();
@@ -8,7 +8,10 @@ const LabelContainer = ({ color, onChange }) => {
         <div>
             <div className="px-4 py-2 flex justify-between border-b border-black ">
                 <div className="font-bold">Label</div>
-                <AddLabelModal handleAddLabel={handleAddLabel} />
+                <div className="flex gap-3">
+                    <BtnVisible onClick={() => {}} />
+                    <AddLabelModal handleAddLabel={handleAddLabel} />
+                </div>
             </div>
 
             <div className="p-2 overflow-y-scroll hide-scrollbar space-y-2">

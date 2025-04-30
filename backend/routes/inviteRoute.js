@@ -1,10 +1,17 @@
 const express = require('express');
 const { requireAuth } = require('../middleware/requireAuth');
 const router = express.Router();
-const { createInvite } = require('../controllers/inviteController');
+const {
+    sendInvite,
+    respondInvite,
+} = require('../controllers/inviteController');
 // requre auth for all routes
 router.use(requireAuth);
-// Create all
-router.post('/', createInvite);
+
+// Send invite
+router.post('/invite', sendInvite);
+
+// Respond to invite
+router.post('/invite/respond', respondInvite);
 
 module.exports = router;

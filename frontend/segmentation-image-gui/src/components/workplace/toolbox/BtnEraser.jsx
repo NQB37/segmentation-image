@@ -17,6 +17,7 @@ const BtnEraser = ({
                     eraserSelected ? 'bg-gray-200 border-gray-200' : 'bg-white'
                 }`}
                 onClick={handleEraser}
+                title="Eraser"
             >
                 <i className="fa-solid fa-eraser"></i>
             </button>

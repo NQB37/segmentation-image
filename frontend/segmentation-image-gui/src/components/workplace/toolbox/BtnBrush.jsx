@@ -14,6 +14,7 @@ const BtnBrush = ({
         <div className="relative group">
             <button
                 onClick={handleBrush}
+                title="Brush"
                 className={`size-8 rounded bg-white border border-black hover:bg-gray-200 hover:border-gray-200 ${
                     brushSelected ? 'bg-gray-200 border-gray-200' : 'bg-white'
                 }`}

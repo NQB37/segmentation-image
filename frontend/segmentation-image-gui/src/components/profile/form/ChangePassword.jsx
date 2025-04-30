@@ -4,6 +4,7 @@ import BtnGray from '../../Share/BtnGray';
 import BtnGreen from '../../Share/BtnGreen';
 import axios from 'axios';
 import { useAuthContext } from '../../../hooks/useAuthContext';
+import BtnBlue from '../../Share/BtnBlue';
 
 const ChangePassword = () => {
     const { user } = useAuthContext();
@@ -53,12 +54,7 @@ const ChangePassword = () => {
     };
     return (
         <>
-            <button
-                onClick={toggleModal}
-                className="w-fit bg-blue-500 text-white px-8 py-2 rounded hover:bg-blue-600 transition-all"
-            >
-                Change Password
-            </button>
+            <BtnBlue text="Change Password" onClick={toggleModal} />
             {isModalOpened && (
                 <div className="fixed inset-0 z-50 flex justify-center items-center w-full h-full bg-black bg-opacity-50 rounded">
                     <div className="w-[450px] h-fit bg-white flex flex-col justify-between rounded">

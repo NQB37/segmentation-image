@@ -6,6 +6,7 @@ const BtnFill = ({ isClick, onClick }) => {
                 className={`size-8 rounded bg-white border border-black hover:bg-gray-200 hover:border-gray-200 ${
                     isClick ? 'bg-gray-200 border-gray-200' : 'bg-white'
                 }`}
+                title="Fill"
             >
                 <i className="fa-solid fa-fill"></i>
             </button>

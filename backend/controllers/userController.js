@@ -36,6 +36,7 @@ const signupUser = async (req, res) => {
     const { email, name, password, confirmPassword } = req.body;
     const baseAvatar =
         'https://cdn.iconscout.com/icon/free/png-256/free-user-icon-download-in-svg-png-gif-file-formats--avatar-person-profile-ui-basic-pack-interface-icons-2082543.png';
+
     try {
         if (!email || !name || !password || !confirmPassword) {
             throw Error('Please fill in all the required fields.');
@@ -44,11 +45,12 @@ const signupUser = async (req, res) => {
             throw Error('Email is not valid.');
         }
         if (!validator.isStrongPassword(password)) {
-            throw Error('Password not strong enough.');
+            throw Error('Password is not strong enough.');
         }
         if (password != confirmPassword) {
             throw Error('Password is not match.');
         }
+
         const exists = await User.findOne({ email });
         if (exists) {
             throw Error('Email already exists.');

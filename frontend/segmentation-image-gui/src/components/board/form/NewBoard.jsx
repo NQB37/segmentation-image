@@ -159,7 +159,7 @@ const NewBoard = () => {
                                 width=""
                             />
                             <BtnGreen
-                                text="Submit"
+                                text="Create"
                                 onClick={handleSubmit}
                                 width=""
                             />

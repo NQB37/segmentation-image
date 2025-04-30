@@ -6,6 +6,7 @@ const CanvasContainer = () => {
         containerRef,
         bgCanvasRef,
         canvasRef,
+        maskCanvasRef,
         scale,
         pos,
         totalDrawnLength,
@@ -18,6 +19,7 @@ const CanvasContainer = () => {
         draw,
         endDrawing,
     } = useCanvasContext();
+
     // init canvas
     useEffect(() => {
         const container = bgCanvasRef.current.parentNode;
@@ -28,7 +30,10 @@ const CanvasContainer = () => {
         bgCanvasRef.current.height = height;
         canvasRef.current.width = width;
         canvasRef.current.height = height;
+        maskCanvasRef.current.width = width;
+        maskCanvasRef.current.height = height;
     }, []);
+
     return (
         <div
             className="relative w-5/6 overflow-hidden"
@@ -51,7 +56,7 @@ const CanvasContainer = () => {
                     ref={bgCanvasRef}
                     className="absolute top-0 left-0 size-full"
                 />
-                {/* Drawing canvas overlay */}
+                {/* Annotation canvas overlay */}
                 <canvas
                     ref={canvasRef}
                     className="absolute top-0 left-0 size-full"
@@ -60,6 +65,11 @@ const CanvasContainer = () => {
                     onMouseMove={draw}
                     onMouseUp={endDrawing}
                     onMouseLeave={endDrawing}
+                />
+                {/* Mark canvas  */}
+                <canvas
+                    ref={maskCanvasRef}
+                    className="absolute top-0 left-0 size-full"
                 />
             </div>
             <div className="absolute right-0 bottom-0 w-fit bg-gray-300">
