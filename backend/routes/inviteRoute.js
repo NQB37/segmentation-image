@@ -8,6 +8,9 @@ const {
 // requre auth for all routes
 router.use(requireAuth);
 
+// get all invite
+// router.get('/', sendInvite);
+
 // Send invite
 router.post('/invite', sendInvite);
 
