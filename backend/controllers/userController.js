@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const validator = require('validator');
 
+// create token base on user id and expire in 30 days
 const createToken = (_id) => {
     return jwt.sign({ _id: _id }, process.env.SECRET, { expiresIn: '30d' });
 };
@@ -12,13 +13,16 @@ const createToken = (_id) => {
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
     try {
+        // check empty
         if (!email || !password) {
             throw Error('Please fill in all the required fields.');
         }
+        // find user by email
         const user = await User.findOne({ email });
         if (!user) {
             throw Error('Wrong email or password.');
         }
+        // compare plain password with hash password
         const match = await bcrypt.compare(password, user.password);
         if (!match) {
             throw Error('Wrong email or password.');
@@ -41,22 +45,30 @@ const signupUser = async (req, res) => {
         if (!email || !name || !password || !confirmPassword) {
             throw Error('Please fill in all the required fields.');
         }
+        // check email
         if (!validator.isEmail(email)) {
             throw Error('Email is not valid.');
         }
+        // check password
         if (!validator.isStrongPassword(password)) {
             throw Error('Password is not strong enough.');
         }
+        // check match password
         if (password != confirmPassword) {
             throw Error('Password is not match.');
         }
 
+        // find user by email
         const exists = await User.findOne({ email });
         if (exists) {
             throw Error('Email already exists.');
         }
+
+        // gen salt
         const salt = await bcrypt.genSalt(10);
+        // hash password
         const hash = await bcrypt.hash(password, salt);
+        // create new user
         const user = await User.create({
             email,
             name,
@@ -92,7 +104,7 @@ const changeAvatar = async (req, res) => {
             throw Error('User not found.');
         }
 
-        // update password
+        // update avatar
         const newInfo = await User.findByIdAndUpdate(
             req.user?._id,
             {
@@ -158,7 +170,7 @@ const changePassword = async (req, res) => {
     }
 };
 
-// change info
+// change information
 const changeInfo = async (req, res) => {
     const { name } = req.body;
     try {
