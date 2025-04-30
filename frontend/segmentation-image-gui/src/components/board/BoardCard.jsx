@@ -1,8 +1,16 @@
+import { useNavigate } from 'react-router-dom';
 import DeleteBoard from './form/DeleteBoard';
 
 const BoardCard = ({ board }) => {
+    const navigate = useNavigate();
+    const handleCardClick = () => {
+        navigate(`/board/${board._id}`);
+    };
     return (
-        <div className="col-span-2 bg-gray-300 p-4 rounded">
+        <div
+            onClick={handleCardClick}
+            className="col-span-2 bg-gray-300 p-4 rounded"
+        >
             <div className="h-40 bg-gray-400 flex items-center justify-center">
                 <img
                     src={board.image}
@@ -19,7 +27,9 @@ const BoardCard = ({ board }) => {
                         <i className="fas fa-user text-purple-400"></i>
                     </div>
                 </div>
-                <DeleteBoard _id={board._id} />
+                <div onClick={(e) => e.stopPropagation()}>
+                    <DeleteBoard _id={board._id} />
+                </div>
             </div>
         </div>
     );

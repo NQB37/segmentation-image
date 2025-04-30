@@ -5,7 +5,6 @@ const mongoose = require('mongoose');
 const getBoards = async (req, res) => {
     const ownerId = req.user._id;
     const boards = await Board.find({ ownerId }).sort({ createAt: -1 });
-    // const boards = await Board.find().sort({ createAt: -1 });
     res.status(200).json(boards);
 };
 

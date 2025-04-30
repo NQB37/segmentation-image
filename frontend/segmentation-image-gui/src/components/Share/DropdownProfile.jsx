@@ -1,16 +1,44 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLogout } from '../../hooks/useLogout';
 import { Link } from 'react-router-dom';
+import { useAuthContext } from '../../hooks/useAuthContext';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const DropdownProfile = () => {
+    const { user } = useAuthContext();
+    const [avatar, setAvatar] = useState('');
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const res = await axios.get(
+                    'http://localhost:3700/api/userRoute/profile',
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${user.token}`,
+                        },
+                    },
+                );
+                setAvatar(res.data.avatar);
+            } catch (error) {
+                toast.error(error.response?.data?.error || 'An error occurred');
+            }
+        };
+        fetchUserData();
+    }, []);
+
     const { logout } = useLogout();
+
     const handleLogout = () => {
         logout();
     };
+
     const [isOpen, setIsOpen] = useState(false);
     const toggleDropdown = () => {
         setIsOpen(!isOpen);
     };
+
     const dropdownRef = useRef(null);
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -34,7 +62,11 @@ const DropdownProfile = () => {
                 onClick={toggleDropdown}
                 className="flex size-10 items-center justify-center overflow-hidden rounded-full border border-black"
             >
-                {/* <img src="" alt="" className="w-full object-cover"/> */}
+                <img
+                    src={avatar}
+                    alt="ser_avatar"
+                    className="w-full object-cover"
+                />
             </button>
             {/* dropdown menu  */}
             {isOpen && (

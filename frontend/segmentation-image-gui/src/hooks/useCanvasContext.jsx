@@ -1,26 +1,27 @@
 import { createContext, useState, useContext, useEffect, useRef } from 'react';
+import * as tf from '@tensorflow/tfjs';
 
 const CanvasContext = createContext();
 
 export const useCanvasContext = () => useContext(CanvasContext);
 
 export const CanvasProvider = ({ children }) => {
+    // canvas ref
     const containerRef = useRef(null);
     const bgCanvasRef = useRef(null);
     const canvasRef = useRef(null);
-    // image
-    const [isUploaded, setIsUploaded] = useState(false);
-    // move
+    const maskCanvasRef = useRef(null);
+    // move tool
     const [moveSelected, setMoveSelected] = useState(false);
     const [pos, setPos] = useState({ x: 0, y: 0 });
     const [startPos, setStartPos] = useState(null);
     const [lastPos, setLastPos] = useState(null);
-    // brush
+    // brush tool
     const [brushSelected, setBrushSelected] = useState(false);
     const [brushSize, setBrushSize] = useState(1);
-    // fill
+    // fill tool
     const [fillSelected, setFillSelected] = useState(false);
-    // eraser
+    // eraser tool
     const [eraserSelected, setEraserSelected] = useState(false);
     const [eraserSize, setEraserSize] = useState(5);
 
@@ -30,6 +31,21 @@ export const CanvasProvider = ({ children }) => {
     const [origin, setOrigin] = useState({ x: 0, y: 0 });
     const [totalDrawnLength, setTotalDrawnLength] = useState(0);
 
+    useEffect(() => {
+        const container = containerRef.current;
+        if (container) {
+            container.addEventListener('wheel', handleWheelZoom, {
+                passive: false,
+            });
+        }
+
+        return () => {
+            if (container) {
+                container.removeEventListener('wheel', handleWheelZoom);
+            }
+        };
+    }, [scale]);
+
     const resetBtn = () => {
         setMoveSelected(false);
         setBrushSelected(false);
@@ -37,38 +53,35 @@ export const CanvasProvider = ({ children }) => {
         setFillSelected(false);
     };
 
-    // upload image
-    const handleUpload = (e) => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onload = () => {
-            const img = new Image();
-            img.onload = () => {
-                const bgCanvas = bgCanvasRef.current;
-                const ctx = bgCanvas.getContext('2d');
-                bgCanvas.width = img.width;
-                bgCanvas.height = img.height;
-                ctx.drawImage(img, 0, 0);
-            };
-            img.src = reader.result;
-            setIsUploaded(true);
+    // load image
+    const handleLoadImage = (image) => {
+        if (!image) return;
+        const img = new Image();
+        img.onload = () => {
+            const bgCanvas = bgCanvasRef.current;
+            if (!bgCanvas) {
+                console.error('Canvas ref is null');
+                return;
+            }
+            const ctx = bgCanvas.getContext('2d');
+            bgCanvas.width = img.width;
+            bgCanvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
         };
-        reader.readAsDataURL(file);
+        img.src = image;
+        console.log('load finished');
     };
+
     //handle move
     const handleMove = () => {
-        if (isUploaded) {
-            resetBtn();
-            setMoveSelected(true);
-        }
+        resetBtn();
+        setMoveSelected(true);
     };
 
     // handle brush
     const handleBrush = () => {
-        if (isUploaded) {
-            resetBtn();
-            setBrushSelected(true);
-        }
+        resetBtn();
+        setBrushSelected(true);
     };
     const handleBrushSize = (e) => {
         e.preventDefault();
@@ -76,19 +89,14 @@ export const CanvasProvider = ({ children }) => {
     };
     // handle fill color
     const handleFill = () => {
+        resetBtn();
         setFillSelected(true);
-        if (isUploaded) {
-            resetBtn();
-            setFillSelected(true);
-        }
     };
 
     // handle eraser
     const handleEraser = () => {
-        if (isUploaded) {
-            resetBtn();
-            setEraserSelected(true);
-        }
+        resetBtn();
+        setEraserSelected(true);
     };
     const handleEraserSize = (e) => {
         e.preventDefault();
@@ -132,7 +140,7 @@ export const CanvasProvider = ({ children }) => {
     };
 
     const startDrawing = (e) => {
-        if (isUploaded && (brushSelected || eraserSelected)) {
+        if (brushSelected || eraserSelected) {
             setIsDrawing(true);
             const ctx = canvasRef.current.getContext('2d');
             if (eraserSelected) {
@@ -179,99 +187,62 @@ export const CanvasProvider = ({ children }) => {
     };
 
     // handle fill
-    const hexToRGBA = (hex) => {
-        const bigint = parseInt(hex.slice(1), 16);
-        return [
-            (bigint >> 16) & 255,
-            (bigint >> 8) & 255,
-            bigint & 255,
-            255, // Alpha
-        ];
-    };
-    const fillArea = (startX, startY, fillColor) => {
-        const ctx = canvasRef.current.getContext('2d');
-        const width = canvasRef.current.width;
-        const height = canvasRef.current.height;
+    const hexToRGBA = (hex) => [
+        (parseInt(hex.slice(1), 16) >> 16) & 255,
+        (parseInt(hex.slice(1), 16) >> 8) & 255,
+        parseInt(hex.slice(1), 16) & 255,
+        255,
+    ];
 
-        // Retrieve the color of the pixel at the starting point
-        const startColor = ctx.getImageData(startX, startY, 1, 1).data;
-        const newColor = hexToRGBA(fillColor);
+    const fillArea = (startX, startY, fillHex) => {
+        const { current: canvas } = canvasRef;
+        const ctx = canvas.getContext('2d');
+        const { width, height } = canvas;
+        const data = ctx.getImageData(0, 0, width, height);
+        const pixels = data.data;
+        const startColor = pixels.slice(
+            (startY * width + startX) * 4,
+            (startY * width + startX) * 4 + 4,
+        );
+        const fillColor = hexToRGBA(fillHex);
+        if (startColor.every((v, i) => v === fillColor[i])) return;
 
-        const pixelStack = [[startX, startY]];
-        const imageData = ctx.getImageData(0, 0, width, height);
-        const data = imageData.data;
+        const match = (x, y) => {
+            const i = (y * width + x) * 4;
+            return startColor.every((v, idx) => v === pixels[i + idx]);
+        };
+        const color = (x, y) => {
+            const i = (y * width + x) * 4;
+            fillColor.forEach((v, idx) => (pixels[i + idx] = v));
+        };
 
-        const colorMatch = (a, b) =>
-            a[0] === b[0] && a[1] === b[1] && a[2] === b[2] && a[3] === b[3];
+        const stack = [[startX, startY]];
 
-        while (pixelStack.length) {
-            let [x, y] = pixelStack.pop();
-            let pixelPos = (y * width + x) * 4;
+        while (stack.length) {
+            let [x, y] = stack.pop();
 
-            while (
-                x >= 0 &&
-                colorMatch(data.slice(pixelPos, pixelPos + 4), startColor)
-            ) {
-                x--;
-                pixelPos -= 4;
-            }
+            while (x >= 0 && match(x, y)) x--;
             x++;
-            pixelPos += 4;
 
-            let reachLeft = false;
-            let reachRight = false;
+            let above = false,
+                below = false;
+            while (x < width && match(x, y)) {
+                color(x, y);
 
-            while (
-                x < width &&
-                colorMatch(data.slice(pixelPos, pixelPos + 4), startColor)
-            ) {
-                // Set the new color
-                data[pixelPos] = newColor[0];
-                data[pixelPos + 1] = newColor[1];
-                data[pixelPos + 2] = newColor[2];
-                data[pixelPos + 3] = newColor[3];
+                if (y > 0 && match(x, y - 1)) {
+                    if (!above) stack.push([x, y - 1]);
+                    above = true;
+                } else above = false;
 
-                // Check pixels above
-                if (y > 0) {
-                    const upPos = pixelPos - width * 4;
-                    if (
-                        !reachLeft &&
-                        colorMatch(data.slice(upPos, upPos + 4), startColor)
-                    ) {
-                        pixelStack.push([x, y - 1]);
-                        reachLeft = true;
-                    } else if (
-                        reachLeft &&
-                        !colorMatch(data.slice(upPos, upPos + 4), startColor)
-                    ) {
-                        reachLeft = false;
-                    }
-                }
+                if (y < height - 1 && match(x, y + 1)) {
+                    if (!below) stack.push([x, y + 1]);
+                    below = true;
+                } else below = false;
 
-                // Check pixels below
-                if (y < height - 1) {
-                    const downPos = pixelPos + width * 4;
-                    if (
-                        !reachRight &&
-                        colorMatch(data.slice(downPos, downPos + 4), startColor)
-                    ) {
-                        pixelStack.push([x, y + 1]);
-                        reachRight = true;
-                    } else if (
-                        reachRight &&
-                        !colorMatch(
-                            data.slice(downPos, downPos + 4),
-                            startColor,
-                        )
-                    ) {
-                        reachRight = false;
-                    }
-                }
                 x++;
-                pixelPos += 4;
             }
         }
-        ctx.putImageData(imageData, 0, 0);
+        ctx.putImageData(data, 0, 0);
     };
 
     // handle zoom
@@ -314,24 +285,74 @@ export const CanvasProvider = ({ children }) => {
         );
     };
 
+    // change label
     const handleColorChange = (e) => {
         e.preventDefault();
         setColor(e.target.value);
     };
 
-    // label
-    const [labels, setLabels] = useState([
-        { id: '1', text: 'Foreground', color: '#ff0000' },
-        { id: '2', text: 'Background', color: '#0000ff' },
-    ]);
+    // labels
+    const [labels, setLabels] = useState([]);
 
-    const handleAddLabel = (id, title, color) => {
-        setLabels((prev) => [...prev, { id: id, text: title, color: color }]);
-        console.log(labels);
+    const handleAddLabel = (title, color) => {
+        setLabels((prev) => [...prev, { text: title, color: color }]);
     };
 
     // segmentation
-    const runSegment = () => {};
+    const [model, setModel] = useState(null);
+    const handleSegment = async () => {
+        console.log('loading');
+        if (!model) {
+            try {
+                console.log('loading');
+                const loadedModel = await tf.loadLayersModel(
+                    '../assets/model.json',
+                );
+                setModel(loadedModel);
+                console.log('run');
+                runSegment(loadedModel);
+            } catch (error) {
+                console.error('Failed to load model:', error);
+            }
+        } else {
+            runSegment(model);
+        }
+    };
+    const runSegment = async () => {
+        const imgCtx = containerRef.current.getContext('2d');
+        const { width, height } = containerRef.current;
+        const imageData = imgCtx.getImageData(0, 0, width, height);
+        // preprocess
+        let tensor = tf.browser
+            .fromPixels(imageData)
+            .toFloat()
+            .div(255)
+            .expandDims(0);
+        // resize
+        tensor = tf.image.resizeBilinear(tensor, [256, 256]);
+        let pred = model.predict(tensor);
+        // resize back
+        pred = tf.image.resizeBilinear(pred, [height, width]);
+
+        const mask = pred.squeeze();
+        const maskArr = await mask.array();
+
+        // draw mask
+        const maskCtx = maskCanvasRef.current.getContext('2d');
+        const maskImg = maskCtx.createImageData(width, height);
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                const i = (y * width + x) * 4;
+                const v = Math.floor(maskArr[y][x] * 255);
+                maskImg.data[i] = 0;
+                maskImg.data[i + 1] = 0;
+                maskImg.data[i + 2] = 0;
+                maskImg.data[i + 3] = v; // grayscale alpha
+            }
+        }
+        maskCtx.putImageData(maskImg, 0, 0);
+        tf.dispose([tensor, pred, mask]);
+    };
 
     return (
         <CanvasContext.Provider
@@ -339,7 +360,7 @@ export const CanvasProvider = ({ children }) => {
                 containerRef,
                 bgCanvasRef,
                 canvasRef,
-                isUploaded,
+                maskCanvasRef,
                 moveSelected,
                 pos,
                 startPos,
@@ -356,7 +377,7 @@ export const CanvasProvider = ({ children }) => {
                 origin,
                 labels,
                 resetBtn,
-                handleUpload,
+                handleLoadImage,
                 handleMove,
                 handleBrush,
                 handleBrushSize,
@@ -378,6 +399,7 @@ export const CanvasProvider = ({ children }) => {
                 handleClearCanvas,
                 handleColorChange,
                 handleAddLabel,
+                handleSegment,
             }}
         >
             {children}

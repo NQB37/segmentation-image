@@ -1,24 +1,18 @@
 import { useState } from 'react';
 
-const AddLabelModal = ({ handleAddLabel }) => {
+const AddUserModal = () => {
     const [isOpened, setIsOpened] = useState(false);
-    const [title, setTitle] = useState('');
-    const [color, setColor] = useState('');
-
+    const [email, setEmail] = useState('');
     const clearForm = () => {
-        setTitle('');
-        setColor('');
+        setEmail('');
     };
     const toggleModal = () => {
         setIsOpened(!isOpened);
     };
     const handleAdd = () => {
-        handleAddLabel(title, color);
-
         clearForm();
         toggleModal();
     };
-
     return (
         <div>
             <button onClick={toggleModal}>
@@ -29,7 +23,7 @@ const AddLabelModal = ({ handleAddLabel }) => {
                     <div className="size-fit bg-white flex flex-col justify-between">
                         {/* header */}
                         <div className="p-6 flex justify-between">
-                            <p className="font-semibold">Add Label</p>
+                            <p className="font-semibold">Invite User</p>
                             <button onClick={toggleModal}>
                                 <i className="fa-solid fa-x"></i>
                             </button>
@@ -38,34 +32,21 @@ const AddLabelModal = ({ handleAddLabel }) => {
                         <div className="grow px-6 py-3 border-y border-[#ECECEC] flex flex-col gap-2">
                             <div className="flex justify-between">
                                 <label htmlFor="title" className="w-12">
-                                    Title:
+                                    Email:
                                 </label>
                                 <input
                                     type="text"
-                                    name="title"
-                                    id="title"
-                                    value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
+                                    name="email"
+                                    id="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                     className="w-80 border-b border-black outline-none"
-                                />
-                            </div>
-                            <div className="flex justify-between items-center">
-                                <label htmlFor="color" className="w-12">
-                                    Color:
-                                </label>
-                                <input
-                                    type="color"
-                                    name="color"
-                                    id="color"
-                                    value={color}
-                                    onChange={(e) => setColor(e.target.value)}
-                                    className="w-20 border-b border-black"
                                 />
                             </div>
                         </div>
                         {/* footer */}
                         <div className="px-6 py-3 flex justify-end">
-                            <button onClick={handleAdd}>Add</button>
+                            <button onClick={handleAdd}>Invite</button>
                         </div>
                     </div>
                 </div>
@@ -74,4 +55,4 @@ const AddLabelModal = ({ handleAddLabel }) => {
     );
 };
 
-export default AddLabelModal;
+export default AddUserModal;

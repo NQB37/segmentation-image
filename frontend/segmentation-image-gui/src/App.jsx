@@ -1,13 +1,10 @@
 import {
-    BrowserRouter as Router,
-    Routes,
-    Route,
     Navigate,
     createBrowserRouter,
+    RouterProvider,
 } from 'react-router-dom';
 import { useAuthContext } from './hooks/useAuthContext';
 import { CanvasProvider } from './hooks/useCanvasContext';
-import WorkplacePage from './pages/Workplace';
 import LoginPage from './pages/Login';
 import SignupPage from './pages/Signup';
 import BoardPage from './pages/Board';
@@ -16,8 +13,71 @@ import 'react-toastify/dist/ReactToastify.css';
 import { BoardContextProvider } from './context/BoardContext';
 import ErrorPage from './pages/Error';
 import ProfilePage from './pages/Profile';
+import BoardDetailPage from './pages/BoardDetail';
 function App() {
     const { user } = useAuthContext();
+    const router = createBrowserRouter([
+        {
+            path: '/',
+            element: user ? (
+                <BoardContextProvider>
+                    <BoardPage />
+                </BoardContextProvider>
+            ) : (
+                <Navigate to="/login" />
+            ),
+            errorElement: <ErrorPage />,
+        },
+        {
+            path: '/board',
+            element: user ? (
+                <BoardContextProvider>
+                    <BoardPage />
+                </BoardContextProvider>
+            ) : (
+                <Navigate to="/login" />
+            ),
+            errorElement: <ErrorPage />,
+        },
+        {
+            path: '/board/:id',
+            element: user ? (
+                <BoardContextProvider>
+                    <CanvasProvider>
+                        <BoardDetailPage />
+                    </CanvasProvider>
+                </BoardContextProvider>
+            ) : (
+                <Navigate to="/login" />
+            ),
+            errorElement: <ErrorPage />,
+        },
+        {
+            path: '/login',
+            element: !user ? <LoginPage /> : <Navigate to="/board" />,
+            errorElement: <ErrorPage />,
+        },
+        {
+            path: '/signup',
+            element: !user ? <SignupPage /> : <Navigate to="/board" />,
+            errorElement: <ErrorPage />,
+        },
+        {
+            path: '/profile',
+            element: user ? (
+                <BoardContextProvider>
+                    <ProfilePage />
+                </BoardContextProvider>
+            ) : (
+                <Navigate to="/login" />
+            ),
+            errorElement: <ErrorPage />,
+        },
+        {
+            path: '*',
+            element: <ErrorPage />,
+        },
+    ]);
     return (
         <>
             <ToastContainer
@@ -32,66 +92,7 @@ function App() {
                 pauseOnHover
                 theme="light"
             />
-            <Router>
-                <Routes>
-                    <Route
-                        path="/"
-                        element={
-                            !user ? (
-                                <CanvasProvider>
-                                    <WorkplacePage />
-                                </CanvasProvider>
-                            ) : (
-                                <Navigate to="/board" />
-                            )
-                        }
-                    ></Route>
-                    <Route
-                        path="/board/:id"
-                        element={
-                            user ? (
-                                <CanvasProvider>
-                                    <WorkplacePage />
-                                </CanvasProvider>
-                            ) : (
-                                <Navigate to="/login" />
-                            )
-                        }
-                    ></Route>
-                    <Route
-                        path="/board"
-                        element={
-                            user ? (
-                                <BoardContextProvider>
-                                    <BoardPage />
-                                </BoardContextProvider>
-                            ) : (
-                                <Navigate to="/login" />
-                            )
-                        }
-                    ></Route>
-                    <Route
-                        path="/login"
-                        element={
-                            !user ? <LoginPage /> : <Navigate to="/board" />
-                        }
-                    ></Route>
-                    <Route
-                        path="/signup"
-                        element={
-                            !user ? <SignupPage /> : <Navigate to="/board" />
-                        }
-                    ></Route>
-                    <Route
-                        path="/profile"
-                        element={
-                            <BoardContextProvider>
-                                <ProfilePage />
-                            </BoardContextProvider>
-                        }
-                    ></Route>
-                </Routes>
-            </Router>
+            <RouterProvider router={router} />
         </>
     );
 }

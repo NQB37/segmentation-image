@@ -8,7 +8,6 @@ import BtnMove from './BtnMove';
 
 const ToolboxContainer = () => {
     const {
-        isUploaded,
         moveSelected,
         brushSelected,
         brushSize,
@@ -16,7 +15,6 @@ const ToolboxContainer = () => {
         eraserSelected,
         eraserSize,
         scale,
-        handleUpload,
         handleMove,
         handleBrush,
         handleBrushSize,
@@ -27,7 +25,7 @@ const ToolboxContainer = () => {
         handleClearCanvas,
     } = useCanvasContext();
     return (
-        <div className="flex justify-between border border-black p-2">
+        <div className="flex justify-between border-y border-black px-4 py-2">
             <div className="flex gap-2 w-full items-center">
                 <BtnMove moveSelected={moveSelected} handleMove={handleMove} />
                 <BtnBrush
@@ -46,28 +44,16 @@ const ToolboxContainer = () => {
                 <CustomZoom value={scale} onChange={handleZoomChange} />
                 <CustomBtn
                     icon={'fa-solid fa-trash'}
+                    title="Eraser all"
                     onClick={handleClearCanvas}
                 />
             </div>
             <div className="flex gap-2 items-center">
-                <label>
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleUpload}
-                        disabled={isUploaded}
-                        className="hidden"
-                    />
-                    <p
-                        className={`px-4 py-2 rounded ${
-                            isUploaded
-                                ? 'bg-gray-400 cursor-not-allowed'
-                                : 'bg-green-400 hover:bg-green-600 cursor-pointer'
-                        }`}
-                    >
-                        Upload
-                    </p>
-                </label>
+                <button
+                    className={`px-4 py-2 rounded bg-green-400 hover:bg-green-600 cursor-pointer`}
+                >
+                    Save
+                </button>
             </div>
         </div>
     );

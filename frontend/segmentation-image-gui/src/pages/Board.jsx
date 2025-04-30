@@ -4,46 +4,57 @@ import { useEffect } from 'react';
 import { useBoardContext } from '../hooks/useBoardContext';
 import { useAuthContext } from '../hooks/useAuthContext';
 import Header from '../components/Share/Header';
+import useFetch from '../hooks/useFetch';
+import Loading from '../components/Share/Loading';
 
 const BoardPage = () => {
     const { boards, dispatch } = useBoardContext();
     const { user } = useAuthContext();
+    const { data, isLoading, error } = useFetch(
+        'http://localhost:3700/api/boardRoute',
+        {
+            headers: { Authorization: `Bearer ${user?.token}` },
+        },
+    );
     useEffect(() => {
-        const fetchBoards = async () => {
-            const res = await fetch('http://localhost:3700/api/boardRoute', {
-                headers: { Authorization: `Bearer ${user.token}` },
-            });
-            const json = await res.json();
-            if (res.ok) {
-                // setBoards(json);
-                dispatch({ type: 'SET_BOARDS', payload: json });
-            }
-        };
-        if (user) {
-            fetchBoards();
+        if (data) {
+            dispatch({ type: 'SET_BOARDS', payload: data });
         }
-    }, [dispatch, user]);
+        console.log('Finish loading board');
+    }, [data, dispatch]);
+
     return (
-        <div className="min-h-screen">
-            <Header />
-            <main className="p-8">
+        <div className="flex flex-col min-h-screen">
+            <div>
+                <Header />
+            </div>
+            <main className="size-full flex-grow p-8">
                 <div className="flex justify-between items-center pb-4 mb-8 border-b border-black">
                     <h1 className="text-3xl font-bold">Project</h1>
                     <NewBoard />
                 </div>
-                <div className="h-full">
-                    {boards.length ? (
-                        <div className="grid grid-cols-12 gap-4">
-                            {boards.map((board) => {
-                                return (
-                                    <BoardCard board={board} key={board._id} />
-                                );
-                            })}
-                        </div>
+                <div className="size-full">
+                    {isLoading ? (
+                        <Loading />
                     ) : (
-                        <div className="size-full flex items-center justify-center">
-                            <p>There is no project.</p>
-                        </div>
+                        <>
+                            {boards.length ? (
+                                <div className="grid grid-cols-12 gap-4">
+                                    {boards.map((board) => {
+                                        return (
+                                            <BoardCard
+                                                board={board}
+                                                key={board._id}
+                                            />
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <div className="size-full flex items-center justify-center">
+                                    <p>There is no project.</p>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </main>

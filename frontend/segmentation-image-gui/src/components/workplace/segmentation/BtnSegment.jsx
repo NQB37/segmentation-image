@@ -1,6 +1,6 @@
-const BtnSegment = () => {
+const BtnSegment = ({ onClick }) => {
     return (
-        <button>
+        <button onClick={onClick}>
             <i className="fa-solid fa-play"></i>
         </button>
     );

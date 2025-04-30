@@ -5,6 +5,7 @@ import ChangeAvatar from '../components/profile/form/ChangeAvatar';
 import axios from 'axios';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { toast } from 'react-toastify';
+import BtnBlue from '../components/Share/BtnBlue';
 
 const ProfilePage = () => {
     const { user } = useAuthContext();
@@ -90,12 +91,7 @@ const ProfilePage = () => {
                                     className="w-80 px-3 py-2 border border-black rounded"
                                 />
                             </div>
-                            <button
-                                onClick={handleChangeName}
-                                className="w-fit bg-blue-500 text-white px-8 py-2 rounded hover:bg-blue-600"
-                            >
-                                Save
-                            </button>
+                            <BtnBlue text="Save" onClick={handleChangeName} />
                         </div>
 
                         <div className="flex flex-col gap-2">
