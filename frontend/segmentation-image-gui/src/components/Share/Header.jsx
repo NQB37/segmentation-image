@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import DropdownProfile from './DropdownProfile';
+import Notification from './Notification';
 
 const Header = () => {
     return (
@@ -7,10 +8,8 @@ const Header = () => {
             <Link to="/board" className="text-4xl font-bold">
                 CellSeg
             </Link>
-            <div className="flex gap-4 items-center">
-                <div className="cursor-pointer">
-                    <i className="fa-solid fa-bell"></i>
-                </div>
+            <div className="flex gap-8 items-center">
+                <Notification />
                 <DropdownProfile />
             </div>
         </header>

@@ -1,17 +1,49 @@
+import axios from 'axios';
 import { useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { useAuthContext } from '../../../../hooks/useAuthContext';
+import BtnGreen from '../../../Share/BtnGreen';
 
-const AddUserModal = () => {
+const AddMemberModal = () => {
     const [isOpened, setIsOpened] = useState(false);
     const [email, setEmail] = useState('');
+
     const clearForm = () => {
         setEmail('');
     };
     const toggleModal = () => {
         setIsOpened(!isOpened);
     };
-    const handleAdd = () => {
+
+    // get board id
+    const { id } = useParams();
+    const { user } = useAuthContext();
+
+    const handleInvite = async () => {
+        if (!email) {
+            toast.error('Please fill email.');
+            return;
+        }
+        try {
+            await axios.post(
+                `http://localhost:3700/api/inviteRoute/invite`,
+                { toEmail: email, boardId: id },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${user.token}`,
+                    },
+                },
+            );
+        } catch (error) {
+            toast.error(
+                error.response?.data?.error || 'An error occurred (FE).',
+            );
+        }
         clearForm();
         toggleModal();
+        toast.success('Send invite successfully.');
     };
     return (
         <div>
@@ -31,7 +63,7 @@ const AddUserModal = () => {
                         {/* body */}
                         <div className="grow px-6 py-3 border-y border-[#ECECEC] flex flex-col gap-2">
                             <div className="flex justify-between">
-                                <label htmlFor="title" className="w-12">
+                                <label htmlFor="email" className="w-12">
                                     Email:
                                 </label>
                                 <input
@@ -46,7 +78,7 @@ const AddUserModal = () => {
                         </div>
                         {/* footer */}
                         <div className="px-6 py-3 flex justify-end">
-                            <button onClick={handleAdd}>Invite</button>
+                            <BtnGreen text="Invite" onClick={handleInvite} />
                         </div>
                     </div>
                 </div>
@@ -55,4 +87,4 @@ const AddUserModal = () => {
     );
 };
 
-export default AddUserModal;
+export default AddMemberModal;

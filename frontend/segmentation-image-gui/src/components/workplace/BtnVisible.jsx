@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
-const BtnVisible = ({ onClick }) => {
-    const [isVisible, setIsVisible] = useState(true);
+const BtnVisible = ({ state, onClick }) => {
+    const [isVisible, setIsVisible] = useState(state);
     const handleClick = () => {
         setIsVisible(!isVisible);
         onClick();

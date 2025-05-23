@@ -1,6 +1,12 @@
 import { useState } from 'react';
+import { useAuthContext } from '../../../../hooks/useAuthContext';
+import { useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import axios from 'axios';
+import BtnGreen from '../../../Share/BtnGreen';
+import { useLabelContext } from '../../../../hooks/useLabelContext';
 
-const AddLabelModal = ({ handleAddLabel }) => {
+const AddLabelModal = () => {
     const [isOpened, setIsOpened] = useState(false);
     const [title, setTitle] = useState('');
     const [color, setColor] = useState('');
@@ -12,8 +18,38 @@ const AddLabelModal = ({ handleAddLabel }) => {
     const toggleModal = () => {
         setIsOpened(!isOpened);
     };
-    const handleAdd = () => {
-        handleAddLabel(title, color);
+
+    // board id
+    const { id } = useParams();
+    const { labelsDispatch } = useLabelContext();
+    const { user } = useAuthContext();
+
+    const handleAdd = async () => {
+        if (!title) {
+            toast.error('Please fill title.');
+            return;
+        }
+        if (!color) {
+            toast.error('Please select color.');
+            return;
+        }
+        try {
+            const res = await axios.post(
+                `http://localhost:3700/api/boardRoute/${id}/label`,
+                { title, color },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${user.token}`,
+                    },
+                },
+            );
+            labelsDispatch({ type: 'CREATE_LABEL', payload: res.data });
+        } catch (error) {
+            toast.error(
+                error.response?.data?.error || 'An error occurred (FE).',
+            );
+        }
 
         clearForm();
         toggleModal();
@@ -64,8 +100,12 @@ const AddLabelModal = ({ handleAddLabel }) => {
                             </div>
                         </div>
                         {/* footer */}
-                        <div className="px-6 py-3 flex justify-end">
-                            <button onClick={handleAdd}>Add</button>
+                        <div className="px-4 py-2 flex justify-end">
+                            <BtnGreen
+                                onClick={handleAdd}
+                                text="Add"
+                                width="w-20"
+                            />
                         </div>
                     </div>
                 </div>

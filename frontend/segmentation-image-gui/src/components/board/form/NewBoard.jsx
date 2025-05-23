@@ -49,10 +49,8 @@ const NewBoard = () => {
             toast.error('Please fill in all required fields (FE).');
             return;
         }
-
         let ownerId = 'temp';
         const board = { title, image, ownerId };
-
         try {
             const res = await axios.post(
                 'http://localhost:3700/api/boardRoute',

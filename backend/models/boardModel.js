@@ -7,9 +7,15 @@ const boardSchema = new Schema(
             required: true,
         },
         image: { type: String, required: true },
-        ownerId: { type: String, required: true },
-        membersId: [{ type: String, required: false }],
-        labelsId: [{ type: String, required: false }],
+        ownerId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+        membersId: [
+            { type: Schema.Types.ObjectId, ref: 'User', required: false },
+        ],
+        labelsId: [
+            { type: Schema.Types.ObjectId, ref: 'Label', required: false },
+        ],
+        annotationImage: { type: String, required: false },
+        segmentImage: { type: String, required: false },
     },
     { timestamps: true },
 );
