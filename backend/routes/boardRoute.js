@@ -7,6 +7,8 @@ const {
     createBoard,
     updateBoard,
     deleteBoard,
+    newLabel,
+    deleteLabel,
 } = require('../controllers/boardController');
 
 // requre auth for all routes
@@ -26,4 +28,11 @@ router.patch('/:id', updateBoard);
 
 // DELETE a new board
 router.delete('/:id', deleteBoard);
+
+// POST a new label
+router.post('/:id/label', newLabel);
+
+// DELETE a label
+router.delete('/:id/label/:labelId', deleteLabel);
+
 module.exports = router;

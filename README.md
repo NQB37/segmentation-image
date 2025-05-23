@@ -25,7 +25,7 @@ or you can download zip file from repository
 Install dependencies in both frontend and backend:
 
 ```bash
-cd frontend
+cd frontend/segmentation-image-gui
 npm install
 
 cd backend
@@ -34,7 +34,7 @@ npm install
 
 # Running the App
 
-Run the two servers in parallel in project root
+Run client and server in parallel
 
 ```bash
 npm run dev

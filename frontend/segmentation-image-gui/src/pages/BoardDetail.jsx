@@ -9,12 +9,16 @@ import useFetch from '../hooks/useFetch';
 import Loading from '../components/Share/Loading';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { useEffect } from 'react';
-import UserContainer from '../components/workplace/user/UserContainer';
+import MemberContainer from '../components/workplace/member/MemberContainer';
+import { useLabelContext } from '../hooks/useLabelContext';
+import { useMemberContext } from '../hooks/useMemberContext';
 
 const BoardDetailPage = () => {
     const { id } = useParams();
     const { user } = useAuthContext();
-    const { handleLoadImage, color, handleColorChange } = useCanvasContext();
+    const { labels, labelsDispatch } = useLabelContext();
+    const { members, membersDispatch } = useMemberContext();
+    const { handleLoadImage } = useCanvasContext();
 
     const { data, isLoading, error } = useFetch(
         `http://localhost:3700/api/boardRoute/${id}`,
@@ -25,7 +29,11 @@ const BoardDetailPage = () => {
 
     useEffect(() => {
         if (data) {
-            handleLoadImage(data.image);
+            console.log(data);
+            handleLoadImage('background', data.image);
+            handleLoadImage('annotation', data.annotationImage);
+            labelsDispatch({ type: 'SET_LABELS', payload: data.labelsId });
+            membersDispatch({ type: 'SET_MEMBERS', payload: data.membersId });
         }
     }, [data]);
 
@@ -46,10 +54,7 @@ const BoardDetailPage = () => {
                             <div className="w-1/6 flex flex-col border-l border-black">
                                 {/* label */}
                                 <div className="h-1/3">
-                                    <LabelContainer
-                                        color={color}
-                                        onChange={handleColorChange}
-                                    />
+                                    <LabelContainer labels={labels} />
                                 </div>
                                 {/* segmentation */}
                                 <div className="h-fit">
@@ -57,7 +62,7 @@ const BoardDetailPage = () => {
                                 </div>
                                 {/* user */}
                                 <div className="h-1/3">
-                                    <UserContainer />
+                                    <MemberContainer members={members} />
                                 </div>
                             </div>
                         </div>

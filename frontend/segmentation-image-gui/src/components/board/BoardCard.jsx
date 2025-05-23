@@ -21,11 +21,7 @@ const BoardCard = ({ board }) => {
             <div className="mt-4 flex justify-between">
                 <div className="flex flex-col justify-between items-start gap-2">
                     <span>{board.title}</span>
-                    <div className="flex space-x-2">
-                        <i className="fas fa-user text-purple-400"></i>
-                        <i className="fas fa-user text-purple-400"></i>
-                        <i className="fas fa-user text-purple-400"></i>
-                    </div>
+                    <p>{board.membersId.length} members</p>
                 </div>
                 <div onClick={(e) => e.stopPropagation()}>
                     <DeleteBoard _id={board._id} />

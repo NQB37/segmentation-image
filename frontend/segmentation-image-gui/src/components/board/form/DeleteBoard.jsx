@@ -32,7 +32,9 @@ const DeleteBoard = ({ _id }) => {
             dispatch({ type: 'DELETE_BOARD', payload: res.data });
             toast.success('Delete project successfully.');
         } catch (error) {
-            toast.error(error.response?.data?.error || 'An error occurred');
+            toast.error(
+                error.response?.data?.error || 'An error occurred (FE).',
+            );
         }
     };
     return (
@@ -60,7 +62,7 @@ const DeleteBoard = ({ _id }) => {
                         {/* footer */}
                         <div className="p-6 flex gap-6">
                             <BtnGray
-                                text="Cancle"
+                                text="Cancel"
                                 onClick={toggleModal}
                                 width=""
                             />

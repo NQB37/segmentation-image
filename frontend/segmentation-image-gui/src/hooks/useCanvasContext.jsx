@@ -1,5 +1,4 @@
 import { createContext, useState, useContext, useEffect, useRef } from 'react';
-import * as tf from '@tensorflow/tfjs';
 
 const CanvasContext = createContext();
 
@@ -26,7 +25,7 @@ export const CanvasProvider = ({ children }) => {
     const [eraserSize, setEraserSize] = useState(5);
 
     const [isDrawing, setIsDrawing] = useState(false);
-    const [color, setColor] = useState('#ff0000');
+    const [color, setColor] = useState('');
     const [scale, setScale] = useState(1);
     const [origin, setOrigin] = useState({ x: 0, y: 0 });
     const [totalDrawnLength, setTotalDrawnLength] = useState(0);
@@ -54,22 +53,35 @@ export const CanvasProvider = ({ children }) => {
     };
 
     // load image
-    const handleLoadImage = (image) => {
+    const handleLoadImage = (type, image) => {
         if (!image) return;
         const img = new Image();
         img.onload = () => {
-            const bgCanvas = bgCanvasRef.current;
-            if (!bgCanvas) {
-                console.error('Canvas ref is null');
-                return;
+            if (type === 'background') {
+                const bgCanvas = bgCanvasRef.current;
+                if (!bgCanvas) {
+                    console.error('Canvas ref is null');
+                    return;
+                }
+                const ctx = bgCanvas.getContext('2d');
+                bgCanvas.width = img.width;
+                bgCanvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+            } else if (type === 'annotation') {
+                const annotationCanvas = canvasRef.current;
+                if (!annotationCanvas) {
+                    console.error('Canvas ref is null');
+                    return;
+                }
+                const ctx = annotationCanvas.getContext('2d');
+                annotationCanvas.width = img.width;
+                annotationCanvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+            } else {
+                // handle segment
             }
-            const ctx = bgCanvas.getContext('2d');
-            bgCanvas.width = img.width;
-            bgCanvas.height = img.height;
-            ctx.drawImage(img, 0, 0);
         };
         img.src = image;
-        console.log('load finished');
     };
 
     //handle move
@@ -81,7 +93,9 @@ export const CanvasProvider = ({ children }) => {
     // handle brush
     const handleBrush = () => {
         resetBtn();
-        setBrushSelected(true);
+        if (color) {
+            setBrushSelected(true);
+        }
     };
     const handleBrushSize = (e) => {
         e.preventDefault();
@@ -90,7 +104,9 @@ export const CanvasProvider = ({ children }) => {
     // handle fill color
     const handleFill = () => {
         resetBtn();
-        setFillSelected(true);
+        if (color) {
+            setFillSelected(true);
+        }
     };
 
     // handle eraser
@@ -293,65 +309,18 @@ export const CanvasProvider = ({ children }) => {
 
     // labels
     const [labels, setLabels] = useState([]);
-
-    const handleAddLabel = (title, color) => {
-        setLabels((prev) => [...prev, { text: title, color: color }]);
+    const [annotationToggle, setAnnotationToggle] = useState(true);
+    const handleAnnotationToggle = () => {
+        setAnnotationToggle(!annotationToggle);
     };
+
+    // members
+    const [members, setMembers] = useState([]);
 
     // segmentation
-    const [model, setModel] = useState(null);
-    const handleSegment = async () => {
-        console.log('loading');
-        if (!model) {
-            try {
-                console.log('loading');
-                const loadedModel = await tf.loadLayersModel(
-                    '../assets/model.json',
-                );
-                setModel(loadedModel);
-                console.log('run');
-                runSegment(loadedModel);
-            } catch (error) {
-                console.error('Failed to load model:', error);
-            }
-        } else {
-            runSegment(model);
-        }
-    };
-    const runSegment = async () => {
-        const imgCtx = containerRef.current.getContext('2d');
-        const { width, height } = containerRef.current;
-        const imageData = imgCtx.getImageData(0, 0, width, height);
-        // preprocess
-        let tensor = tf.browser
-            .fromPixels(imageData)
-            .toFloat()
-            .div(255)
-            .expandDims(0);
-        // resize
-        tensor = tf.image.resizeBilinear(tensor, [256, 256]);
-        let pred = model.predict(tensor);
-        // resize back
-        pred = tf.image.resizeBilinear(pred, [height, width]);
-
-        const mask = pred.squeeze();
-        const maskArr = await mask.array();
-
-        // draw mask
-        const maskCtx = maskCanvasRef.current.getContext('2d');
-        const maskImg = maskCtx.createImageData(width, height);
-        for (let y = 0; y < height; y++) {
-            for (let x = 0; x < width; x++) {
-                const i = (y * width + x) * 4;
-                const v = Math.floor(maskArr[y][x] * 255);
-                maskImg.data[i] = 0;
-                maskImg.data[i + 1] = 0;
-                maskImg.data[i + 2] = 0;
-                maskImg.data[i + 3] = v; // grayscale alpha
-            }
-        }
-        maskCtx.putImageData(maskImg, 0, 0);
-        tf.dispose([tensor, pred, mask]);
+    const [maskToggle, setMaskToggle] = useState(false);
+    const handleMaskToggle = () => {
+        setAnnotationToggle(!annotationToggle);
     };
 
     return (
@@ -376,6 +345,8 @@ export const CanvasProvider = ({ children }) => {
                 scale,
                 origin,
                 labels,
+                annotationToggle,
+                maskToggle,
                 resetBtn,
                 handleLoadImage,
                 handleMove,
@@ -398,8 +369,8 @@ export const CanvasProvider = ({ children }) => {
                 handleCanvasClick,
                 handleClearCanvas,
                 handleColorChange,
-                handleAddLabel,
-                handleSegment,
+                handleAnnotationToggle,
+                handleMaskToggle,
             }}
         >
             {children}

@@ -14,6 +14,8 @@ import { BoardContextProvider } from './context/BoardContext';
 import ErrorPage from './pages/Error';
 import ProfilePage from './pages/Profile';
 import BoardDetailPage from './pages/BoardDetail';
+import { LabelContextProvider } from './context/LabelContext';
+import { MemberContextProvider } from './context/MemberContext';
 function App() {
     const { user } = useAuthContext();
     const router = createBrowserRouter([
@@ -43,9 +45,13 @@ function App() {
             path: '/board/:id',
             element: user ? (
                 <BoardContextProvider>
-                    <CanvasProvider>
-                        <BoardDetailPage />
-                    </CanvasProvider>
+                    <LabelContextProvider>
+                        <MemberContextProvider>
+                            <CanvasProvider>
+                                <BoardDetailPage />
+                            </CanvasProvider>
+                        </MemberContextProvider>
+                    </LabelContextProvider>
                 </BoardContextProvider>
             ) : (
                 <Navigate to="/login" />

@@ -18,6 +18,8 @@ const CanvasContainer = () => {
         startDrawing,
         draw,
         endDrawing,
+        annotationToggle,
+        maskToggle,
     } = useCanvasContext();
 
     // init canvas
@@ -54,22 +56,30 @@ const CanvasContainer = () => {
                 {/* Background canvas for image */}
                 <canvas
                     ref={bgCanvasRef}
-                    className="absolute top-0 left-0 size-full"
+                    className={`z-0 absolute top-0 left-0 size-full `}
+                />
+                {/* Mark canvas  */}
+                {/* <canvas
+                    ref={maskCanvasRef}
+                    className={`z-10 absolute top-0 left-0 size-full ${
+                        maskToggle ? '' : 'hidden'
+                    }`}
+                /> */}
+                <canvas
+                    ref={maskCanvasRef}
+                    className={`z-10 absolute top-0 left-0 size-full`}
                 />
                 {/* Annotation canvas overlay */}
                 <canvas
                     ref={canvasRef}
-                    className="absolute top-0 left-0 size-full"
+                    className={`z-20 absolute top-0 left-0 size-full ${
+                        annotationToggle ? '' : 'hidden'
+                    }`}
                     onClick={handleCanvasClick}
                     onMouseDown={startDrawing}
                     onMouseMove={draw}
                     onMouseUp={endDrawing}
                     onMouseLeave={endDrawing}
-                />
-                {/* Mark canvas  */}
-                <canvas
-                    ref={maskCanvasRef}
-                    className="absolute top-0 left-0 size-full"
                 />
             </div>
             <div className="absolute right-0 bottom-0 w-fit bg-gray-300">
