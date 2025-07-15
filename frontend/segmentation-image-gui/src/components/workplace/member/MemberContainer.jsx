@@ -1,35 +1,34 @@
-import AddMemberModal from './form/AddMemberModal';
+import AddMemberModal from "./form/AddMemberModal";
+import DeleteMemberModal from "./form/DeleteMemberModal";
 
 const MemberContainer = ({ members }) => {
-    const handleDeleteMember = async (_id) => {};
-    return (
-        <div>
-            <div className="px-4 py-2 flex justify-between border-b border-black ">
-                <div className="font-bold">User</div>
-                <AddMemberModal />
-            </div>
+  return (
+    <div>
+      <div className="px-4 py-2 flex justify-between border-b border-black ">
+        <div className="font-bold">User</div>
+        <AddMemberModal />
+      </div>
 
-            <div className="px-4 py-2 overflow-y-scroll hide-scrollbar space-y-2">
-                {members.map((member) => {
-                    <div className="p-1 flex justify-between hover border-b border-black">
-                        <div key={member._id}>
-                            <img src={member.avatar} alt={member.name} />
-                            <div>{member.name}</div>
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDeleteMember(member._id);
-                                }}
-                            >
-                                <i className="fa-solid fa-trash"></i>
-                            </button>
-                        </div>
-                        ;
-                    </div>;
-                })}
+      <div className="px-4 py-2 overflow-y-scroll hide-scrollbar space-y-2">
+        {members.map((member) => (
+          <div
+            key={member._id}
+            className="p-1 flex justify-between hover border-b border-black"
+          >
+            <div className="flex items-center space-x-2">
+              <img
+                src={member.avatar}
+                alt={member.name}
+                className="w-8 h-8 rounded-full"
+              />
+              <div>{member.name}</div>
             </div>
-        </div>
-    );
+            <DeleteMemberModal _id={member._id} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default MemberContainer;
