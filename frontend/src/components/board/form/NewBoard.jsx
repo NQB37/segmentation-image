@@ -74,27 +74,38 @@ const NewBoard = () => {
         <>
             <button
                 onClick={toggleModal}
-                className="bg-green-400 text-white px-4 py-2 rounded hover:bg-green-500 transition-all"
+                className="inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-md bg-emerald-500 px-4 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
             >
-                + Project
+                <i className="fa-solid fa-plus text-xs"></i>
+                New project
             </button>
             {isModalOpened && (
-                <div className="fixed inset-0 z-50 flex justify-center items-center w-full h-full bg-black bg-opacity-50">
-                    <div className="w-[450px] h-fit bg-white flex flex-col justify-between">
+                <div className="fixed inset-0 z-50 flex size-full items-center justify-center bg-slate-950/50 px-4">
+                    <div className="flex h-fit w-full max-w-[480px] flex-col justify-between overflow-hidden rounded-lg bg-white shadow-xl">
                         {/* header */}
-                        <div className="p-6 flex justify-between">
-                            <p className="font-semibold">New project</p>
-                            <button onClick={toggleModal}>
+                        <div className="flex items-center justify-between px-6 py-5">
+                            <div>
+                                <p className="font-semibold text-slate-950">
+                                    New project
+                                </p>
+                                <p className="mt-1 text-sm text-slate-500">
+                                    Upload a source image to start annotation.
+                                </p>
+                            </div>
+                            <button
+                                onClick={toggleModal}
+                                className="flex size-9 cursor-pointer items-center justify-center rounded-md text-slate-500 transition-colors duration-200 hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            >
                                 <i className="fa-solid fa-x"></i>
                             </button>
                         </div>
                         {/* body */}
-                        <div className="grow border-y border-gray-400 px-6 py-3 flex flex-col gap-2">
+                        <div className="flex grow flex-col gap-2 border-y border-slate-200 px-6 py-4">
                             <form action="" method="post">
-                                <div className="mb-4 ">
+                                <div className="mb-4">
                                     <label
                                         htmlFor="title"
-                                        className="block font-bold mb-2"
+                                        className="mb-2 block text-sm font-semibold text-slate-700"
                                     >
                                         Title{' '}
                                         <span className="text-red-500">*</span>
@@ -107,16 +118,16 @@ const NewBoard = () => {
                                         onChange={(e) =>
                                             setTitle(e.target.value)
                                         }
-                                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        className="w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 shadow-sm outline-none transition duration-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
                                     />
                                 </div>
                                 <div className="mb-4 space-y-2">
                                     <div className="flex flex-col items-start">
                                         <label
                                             htmlFor="image"
-                                            className="h-32 w-full flex flex-col cursor-pointer"
+                                            className="flex w-full cursor-pointer flex-col"
                                         >
-                                            <p className="font-bold">
+                                            <p className="mb-2 text-sm font-semibold text-slate-700">
                                                 Image{' '}
                                                 <span className="text-red-500">
                                                     *
@@ -124,16 +135,19 @@ const NewBoard = () => {
                                             </p>
 
                                             {image ? (
-                                                <div className="size-full border border-dashed flex justify-center items-center">
+                                                <div className="flex h-44 w-full items-center justify-center overflow-hidden rounded-md border border-dashed border-slate-300 bg-slate-50">
                                                     <img
                                                         src={image}
                                                         alt="image"
-                                                        className="object-fill h-full"
+                                                        className="size-full object-contain"
                                                     />
                                                 </div>
                                             ) : (
-                                                <div className="h-32 w-full border border-dashed flex justify-center items-center">
-                                                    Preview Image
+                                                <div className="flex h-44 w-full flex-col items-center justify-center rounded-md border border-dashed border-slate-300 bg-slate-50 text-slate-500 transition-colors duration-200 hover:border-indigo-300 hover:bg-indigo-50">
+                                                    <i className="fa-regular fa-image text-2xl"></i>
+                                                    <span className="mt-2 text-sm">
+                                                        Choose image
+                                                    </span>
                                                 </div>
                                             )}
                                         </label>
@@ -150,7 +164,7 @@ const NewBoard = () => {
                             </form>
                         </div>
                         {/* footer */}
-                        <div className="p-6 flex gap-6">
+                        <div className="flex gap-3 px-6 py-5">
                             <BtnGray
                                 text="Cancel"
                                 onClick={toggleModal}

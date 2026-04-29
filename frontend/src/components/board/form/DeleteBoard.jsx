@@ -41,26 +41,32 @@ const DeleteBoard = ({ _id }) => {
         <>
             <button
                 onClick={toggleModal}
-                className="size-fit px-2 bg-gray-200 rounded-sm cursor-pointer hover:bg-gray-100 transition-all"
+                className="flex size-9 cursor-pointer items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 transition-colors duration-200 hover:border-red-200 hover:bg-red-50 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                aria-label="Delete project"
             >
-                <i className="fa-solid fa-trash text-red-500"></i>
+                <i className="fa-solid fa-trash text-sm"></i>
             </button>
             {isModalOpened && (
-                <div className="fixed inset-0 z-50 flex justify-center items-center w-full h-full bg-black bg-opacity-50">
-                    <div className="w-[450px] h-fit bg-white flex flex-col justify-between">
+                <div className="fixed inset-0 z-50 flex size-full items-center justify-center bg-slate-950/50 px-4">
+                    <div className="flex h-fit w-full max-w-[450px] flex-col justify-between overflow-hidden rounded-lg bg-white shadow-xl">
                         {/* header */}
-                        <div className="p-6 flex justify-between">
-                            <p className="font-semibold">Delete</p>
-                            <button onClick={toggleModal}>
+                        <div className="flex items-center justify-between px-6 py-5">
+                            <p className="font-semibold text-slate-950">
+                                Delete project
+                            </p>
+                            <button
+                                onClick={toggleModal}
+                                className="flex size-9 cursor-pointer items-center justify-center rounded-md text-slate-500 transition-colors duration-200 hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            >
                                 <i className="fa-solid fa-x"></i>
                             </button>
                         </div>
                         {/* body */}
-                        <div className="grow border-y border-gray-400 px-6 py-3 flex flex-col gap-2">
-                            Do you want to delete this project?
+                        <div className="flex grow flex-col gap-2 border-y border-slate-200 px-6 py-4 text-sm text-slate-600">
+                            This removes the project and its saved annotations.
                         </div>
                         {/* footer */}
-                        <div className="p-6 flex gap-6">
+                        <div className="flex gap-3 px-6 py-5">
                             <BtnGray
                                 text="Cancel"
                                 onClick={toggleModal}
