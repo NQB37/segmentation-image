@@ -1,30 +1,27 @@
-import LabelContainer from "../components/workplace/label/LabelContainer";
-import { useCanvasContext } from "../hooks/useCanvasContext";
+import Header from "../components/Share/Header";
+import ToolPropertiesBar from "../components/workplace/toolbox/ToolPropertiesBar";
 import ToolboxContainer from "../components/workplace/toolbox/ToolboxContainer";
 import CanvasContainer from "../components/workplace/canvas/CanvasContainer";
-import Header from "../components/Share/Header";
+import WorkspaceSidebar from "../components/workplace/WorkspaceSidebar";
 import { useParams } from "react-router-dom";
 import useFetch from "../hooks/useFetch";
 import Loading from "../components/Share/Loading";
 import { useAuthContext } from "../hooks/useAuthContext";
 import { useEffect } from "react";
-import MemberContainer from "../components/workplace/member/MemberContainer";
+import { useCanvasContext } from "../hooks/useCanvasContext";
 import { useLabelContext } from "../hooks/useLabelContext";
 import { useMemberContext } from "../hooks/useMemberContext";
 
 const BoardDetailPage = () => {
   const { id } = useParams();
   const { user } = useAuthContext();
-  const { labels, labelsDispatch } = useLabelContext();
-  const { members, membersDispatch } = useMemberContext();
+  const { labelsDispatch } = useLabelContext();
+  const { membersDispatch } = useMemberContext();
   const { handleLoadImage } = useCanvasContext();
 
-  const { data, isLoading, error } = useFetch(
-    `/api/boardRoute/${id}`,
-    {
-      headers: { Authorization: `Bearer ${user?.token}` },
-    }
-  );
+  const { data, isLoading } = useFetch(`/api/boardRoute/${id}`, {
+    headers: { Authorization: `Bearer ${user?.token}` },
+  });
 
   useEffect(() => {
     if (data) {
@@ -34,39 +31,21 @@ const BoardDetailPage = () => {
       membersDispatch({ type: "SET_MEMBERS", payload: data.membersId });
     }
   }, [data]);
+
+  if (isLoading) return <Loading />;
+
   return (
-    <div>
+    <div className="flex flex-col h-screen overflow-hidden bg-background">
       <Header />
-      <>
-        {isLoading ? (
-          <Loading />
-        ) : (
-          <div className="flex flex-col h-screen">
-            {/* tool box */}
-            <ToolboxContainer />
-            <div className="flex grow">
-              {/* canvas field */}
-              <CanvasContainer />
-              {/* label/user field */}
-              <div className="w-1/6 flex flex-col border-l border-black">
-                {/* label */}
-                <div className="h-1/3">
-                  <LabelContainer labels={labels} />
-                </div>
-                {/* Segmentation controls stay hidden until inference and mask rendering are implemented. */}
-                {/* user */}
-                <div className="h-1/3">
-                  <MemberContainer
-                    members={members.filter(
-                      (member) => member.email !== user.email
-                    )}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </>
+      <ToolPropertiesBar />
+      
+      <div className="flex flex-grow overflow-hidden">
+        <ToolboxContainer />
+        <main className="flex-grow relative bg-slate-50 overflow-hidden">
+          <CanvasContainer />
+        </main>
+        <WorkspaceSidebar />
+      </div>
     </div>
   );
 };
