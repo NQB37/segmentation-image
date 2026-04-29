@@ -1,7 +1,7 @@
-const express = require("express");
-const { requireAuth } = require("../middleware/requireAuth");
+import express from "express";
+import { requireAuth } from "../middleware/requireAuth.js";
 const router = express.Router();
-const {
+import {
   getBoards,
   getBoardById,
   createBoard,
@@ -10,7 +10,7 @@ const {
   newLabel,
   deleteLabel,
   deleteMember,
-} = require("../controllers/boardController");
+} from "../controllers/boardController.js";
 
 // requre auth for all routes
 router.use(requireAuth);
@@ -39,4 +39,4 @@ router.delete("/:id/label/:labelId", deleteLabel);
 // DELETE a member
 router.delete("/:id/member/:memberId", deleteMember);
 
-module.exports = router;
+export default router;

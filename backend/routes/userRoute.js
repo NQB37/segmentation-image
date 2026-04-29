@@ -1,13 +1,13 @@
-const express = require('express');
-const { requireAuth } = require('../middleware/requireAuth');
-const {
+import express from 'express';
+import { requireAuth } from '../middleware/requireAuth.js';
+import {
     loginUser,
     signupUser,
     changeAvatar,
     changePassword,
     getUserById,
     changeInfo,
-} = require('../controllers/userController');
+} from '../controllers/userController.js';
 const router = express.Router();
 
 // login route
@@ -31,4 +31,4 @@ router.patch('/change-password', changePassword);
 // change info
 router.patch('/change-info', changeInfo);
 
-module.exports = router;
+export default router;

@@ -1,7 +1,7 @@
-const Board = require("../models/boardModel");
-const Label = require("../models/labelModel");
-const User = require("../models/userModel");
-const mongoose = require("mongoose");
+import Board from "../models/boardModel.js";
+import Label from "../models/labelModel.js";
+import User from "../models/userModel.js";
+import mongoose from "mongoose";
 
 // get all boards
 const getBoards = async (req, res) => {
@@ -193,7 +193,7 @@ const deleteMember = async (req, res) => {
   } catch (error) {}
 };
 
-module.exports = {
+export {
   getBoards,
   getBoardById,
   createBoard,

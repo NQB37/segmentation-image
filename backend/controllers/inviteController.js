@@ -1,7 +1,7 @@
-const Invite = require("../models/inviteModel");
-const User = require("../models/userModel");
-const Board = require("../models/boardModel");
-const mongoose = require("mongoose");
+import Invite from "../models/inviteModel.js";
+import User from "../models/userModel.js";
+import Board from "../models/boardModel.js";
+import mongoose from "mongoose";
 
 // get all invites
 const getInvites = async (req, res) => {
@@ -98,4 +98,4 @@ const respondInvite = async (req, res) => {
   }
 };
 
-module.exports = { getInvites, sendInvite, respondInvite };
+export { getInvites, sendInvite, respondInvite };
