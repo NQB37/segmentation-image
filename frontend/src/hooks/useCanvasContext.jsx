@@ -332,8 +332,18 @@ export const CanvasProvider = ({ children }) => {
 
     // change label
     const handleColorChange = (e) => {
-        e.preventDefault();
-        setColor(e.target.value);
+        if (!e) return;
+        const newColor = e.target ? e.target.value : e;
+        setColor(newColor);
+        
+        // UX improvement: if a drawing tool is not selected, select the brush
+        if (!brushSelected && !fillSelected && !eraserSelected) {
+            handleBrush();
+            // Re-call handleBrush might be tricky if it uses the old 'color' state
+            // Let's manually set it to be safe
+            resetBtn();
+            setBrushSelected(true);
+        }
     };
 
     // labels
