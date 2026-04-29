@@ -55,7 +55,14 @@ export const CanvasProvider = ({ children }) => {
 
     // load image
     const handleLoadImage = (type, image) => {
-        if (!image) return;
+        if (!image) {
+            // Clear the layer if no image is provided (e.g. annotation layer)
+            if (type === 'annotation' && canvasRef.current) {
+                const ctx = canvasRef.current.getContext('2d');
+                ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+            }
+            return;
+        }
         const img = new Image();
         img.onload = () => {
             const bgCanvas = bgCanvasRef.current;
@@ -63,24 +70,32 @@ export const CanvasProvider = ({ children }) => {
             const maskCanvas = maskCanvasRef.current;
 
             if (bgCanvas && annotationCanvas && maskCanvas) {
-                // Synchronize all canvas dimensions to the loaded image
-                bgCanvas.width = img.width;
-                bgCanvas.height = img.height;
-                annotationCanvas.width = img.width;
-                annotationCanvas.height = img.height;
-                maskCanvas.width = img.width;
-                maskCanvas.height = img.height;
+                // Synchronize all canvas dimensions to the loaded image ONLY if they differ
+                // This prevents clearing the canvas when loading multiple layers (bg and annotation)
+                if (bgCanvas.width !== img.width || bgCanvas.height !== img.height) {
+                    bgCanvas.width = img.width;
+                    bgCanvas.height = img.height;
+                    annotationCanvas.width = img.width;
+                    annotationCanvas.height = img.height;
+                    maskCanvas.width = img.width;
+                    maskCanvas.height = img.height;
 
-                setCanvasSize({ width: img.width, height: img.height });
+                    setCanvasSize({ width: img.width, height: img.height });
+                }
 
                 if (type === 'background') {
                     const ctx = bgCanvas.getContext('2d');
+                    ctx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
                     ctx.drawImage(img, 0, 0);
                 } else if (type === 'annotation') {
                     const ctx = annotationCanvas.getContext('2d');
+                    ctx.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height);
                     ctx.drawImage(img, 0, 0);
                 }
             }
+        };
+        img.onerror = () => {
+            console.error(`Failed to load image for ${type}:`, image.slice(0, 50) + '...');
         };
         img.src = image;
     };
@@ -155,10 +170,17 @@ export const CanvasProvider = ({ children }) => {
 
     // handle draw
     const getMousePosition = (e) => {
-        const rect = canvasRef.current.getBoundingClientRect();
+        const canvas = canvasRef.current;
+        if (!canvas) return { x: 0, y: 0 };
+        const rect = canvas.getBoundingClientRect();
+        
+        // Account for the ratio between internal resolution and CSS display size
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+
         return {
-            x: (e.clientX - rect.left) / scale,
-            y: (e.clientY - rect.top) / scale,
+            x: (e.clientX - rect.left) * scaleX,
+            y: (e.clientY - rect.top) * scaleY,
         };
     };
 
