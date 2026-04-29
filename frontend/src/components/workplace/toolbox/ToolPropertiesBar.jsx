@@ -1,7 +1,6 @@
 import { Slider } from "../../ui/slider";
 import { Label } from "../../ui/label";
 import { useCanvasContext } from "../../../hooks/useCanvasContext";
-import { Separator } from "../../ui/separator";
 
 const ToolPropertiesBar = () => {
   const { 
@@ -26,7 +25,7 @@ const ToolPropertiesBar = () => {
           <div className="w-32">
             <Slider 
               value={[brushSize]} 
-              onValueChange={(val) => handleBrushSize({ target: { value: val[0] } })} 
+              onValueChange={(val) => handleBrushSize(val[0])} 
               max={100} 
               step={1} 
             />
@@ -41,7 +40,7 @@ const ToolPropertiesBar = () => {
           <div className="w-32">
             <Slider 
               value={[eraserSize]} 
-              onValueChange={(val) => handleEraserSize({ target: { value: val[0] } })} 
+              onValueChange={(val) => handleEraserSize(val[0])} 
               max={100} 
               step={1} 
             />
