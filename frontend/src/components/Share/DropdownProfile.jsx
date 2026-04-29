@@ -1,93 +1,127 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLogout } from '../../hooks/useLogout';
 import { Link } from 'react-router-dom';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import { toast } from 'react-toastify';
 import apiClient from '../../api/client';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { LogOut, UserRound } from 'lucide-react';
+
+const getInitials = (name, email) => {
+    const source = name || email || 'User';
+    return source
+        .split(/[\s@.]+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0]?.toUpperCase())
+        .join('');
+};
 
 const DropdownProfile = () => {
     const { user } = useAuthContext();
-    const [avatar, setAvatar] = useState('');
+    const { logout } = useLogout();
+    const [profile, setProfile] = useState({
+        avatar: '',
+        email: user?.email || '',
+        name: '',
+    });
+
     useEffect(() => {
+        if (!user?.token) {
+            return;
+        }
+
         const fetchUserData = async () => {
             try {
-                const res = await apiClient.get(
-                    '/api/userRoute/profile',
-                    {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `Bearer ${user.token}`,
-                        },
+                const res = await apiClient.get('/api/userRoute/profile', {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${user.token}`,
                     },
-                );
-                setAvatar(res.data.avatar);
+                });
+                setProfile({
+                    avatar: res.data.avatar || '',
+                    email: res.data.email || user.email || '',
+                    name: res.data.name || '',
+                });
             } catch (error) {
                 toast.error(error.response?.data?.error || 'An error occurred');
             }
         };
+
         fetchUserData();
-    }, []);
+    }, [user]);
 
-    const { logout } = useLogout();
-
-    const handleLogout = () => {
-        logout();
-    };
-
-    const [isOpen, setIsOpen] = useState(false);
-    const toggleDropdown = () => {
-        setIsOpen(!isOpen);
-    };
-
-    const dropdownRef = useRef(null);
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (
-                dropdownRef.current &&
-                !dropdownRef.current.contains(event.target)
-            ) {
-                setIsOpen(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
     return (
-        <div ref={dropdownRef} className="group relative">
-            {/* dropdown button  */}
-            <button
-                onClick={toggleDropdown}
-                className="flex size-10 items-center justify-center overflow-hidden rounded-full border border-black"
-            >
-                <img
-                    src={avatar}
-                    alt="ser_avatar"
-                    className="w-full object-cover"
-                />
-            </button>
-            {/* dropdown menu  */}
-            {isOpen && (
-                <div
-                    className={`absolute right-0 top-full mt-1 rounded flex flex-col border border-black`}
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button
+                    variant="ghost"
+                    size="icon-lg"
+                    className="rounded-full"
+                    aria-label="Open profile menu"
                 >
-                    <Link
-                        to="/profile"
-                        className="px-8 py-2 bg-white border-b border-black rounded-t hover:bg-gray-100 cursor-pointer"
-                    >
+                    <Avatar size="lg">
+                        {profile.avatar ? (
+                            <AvatarImage
+                                src={profile.avatar}
+                                alt={profile.name || profile.email || 'User'}
+                            />
+                        ) : null}
+                        <AvatarFallback>
+                            {getInitials(profile.name, profile.email)}
+                        </AvatarFallback>
+                    </Avatar>
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-64">
+                <DropdownMenuLabel className="px-2 py-2">
+                    <div className="flex items-center gap-3">
+                        <Avatar>
+                            {profile.avatar ? (
+                                <AvatarImage
+                                    src={profile.avatar}
+                                    alt={
+                                        profile.name || profile.email || 'User'
+                                    }
+                                />
+                            ) : null}
+                            <AvatarFallback>
+                                {getInitials(profile.name, profile.email)}
+                            </AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0">
+                            <p className="truncate text-sm font-medium text-foreground">
+                                {profile.name || 'CellSeg user'}
+                            </p>
+                            <p className="truncate text-xs text-muted-foreground">
+                                {profile.email || user?.email}
+                            </p>
+                        </div>
+                    </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                    <Link to="/profile">
+                        <UserRound className="size-4" />
                         Profile
                     </Link>
-                    <button
-                        onClick={handleLogout}
-                        className="px-8 py-2 bg-white rounded-b hover:bg-gray-100 cursor-pointer"
-                    >
-                        Logout
-                    </button>
-                </div>
-            )}
-        </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem variant="destructive" onClick={logout}>
+                    <LogOut className="size-4" />
+                    Logout
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
     );
 };
 
