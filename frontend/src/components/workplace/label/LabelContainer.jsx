@@ -51,28 +51,40 @@ const LabelContainer = ({ labels }) => {
                             key={label._id}
                             tabIndex="0"
                             role="button"
-                            onClick={() => handleColorChange({ target: { value: label.color } })}
+                            onClick={() => handleColorChange(label.color)}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' || e.key === ' ') {
-                                    handleColorChange({ target: { value: label.color } });
+                                    handleColorChange(label.color);
                                 }
                             }}
-                            className={`flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors group ${
-                                color === label.color ? 'bg-accent text-accent-foreground' : 'hover:bg-muted'
+                            className={`flex items-center justify-between p-2 rounded-md cursor-pointer transition-all group border-2 ${
+                                color === label.color 
+                                ? 'bg-accent border-primary/50 text-accent-foreground shadow-sm scale-[1.02]' 
+                                : 'hover:bg-muted border-transparent'
                             }`}
                         >
                             <div className="flex items-center gap-3">
-                                <div className="w-3 h-3 rounded-full border border-black/10" style={{ backgroundColor: label.color }} />
-                                <span className="text-sm font-medium">{label.title}</span>
+                                <div 
+                                    className={`w-4 h-4 rounded-full border shadow-inner transition-transform ${color === label.color ? 'scale-110' : ''}`} 
+                                    style={{ backgroundColor: label.color, borderColor: 'rgba(0,0,0,0.1)' }} 
+                                />
+                                <span className={`text-sm ${color === label.color ? 'font-bold' : 'font-medium'}`}>
+                                    {label.title}
+                                </span>
                             </div>
-                            <Button 
-                                variant="ghost" 
-                                size="icon" 
-                                className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
-                                onClick={(e) => { e.stopPropagation(); handleDeleteLabel(label._id); }}
-                            >
-                                <Trash2 className="h-3.5 w-3.5" />
-                            </Button>
+                            <div className="flex items-center gap-1">
+                                {color === label.color && (
+                                    <span className="text-[10px] font-bold uppercase text-primary px-1.5 py-0.5 bg-primary/10 rounded mr-1">Active</span>
+                                )}
+                                <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    onClick={(e) => { e.stopPropagation(); handleDeleteLabel(label._id); }}
+                                >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                </Button>
+                            </div>
                         </div>
                     ))}
                 </div>
