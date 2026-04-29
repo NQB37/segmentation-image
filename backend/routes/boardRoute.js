@@ -1,16 +1,17 @@
-import express from "express";
-import { requireAuth } from "../middleware/requireAuth.js";
-const router = express.Router();
+import express from 'express';
+import { requireAuth } from '../middleware/requireAuth.js';
 import {
-  getBoards,
-  getBoardById,
-  createBoard,
-  updateBoard,
-  deleteBoard,
-  newLabel,
-  deleteLabel,
-  deleteMember,
-} from "../controllers/boardController.js";
+    getBoards,
+    getBoardById,
+    createBoard,
+    updateBoard,
+    deleteBoard,
+    newLabel,
+    deleteLabel,
+    deleteMember,
+} from '../controllers/boardController.js';
+
+const router = express.Router();
 
 // requre auth for all routes
 router.use(requireAuth);

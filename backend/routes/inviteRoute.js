@@ -1,11 +1,12 @@
 import express from 'express';
 import { requireAuth } from '../middleware/requireAuth.js';
-const router = express.Router();
 import {
     getInvites,
     sendInvite,
     respondInvite,
 } from '../controllers/inviteController.js';
+
+const router = express.Router();
 
 // requre auth for all routes
 router.use(requireAuth);
