@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { useAuthContext } from '../../../../hooks/useAuthContext';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import axios from 'axios';
 import BtnGreen from '../../../Share/BtnGreen';
 import { useLabelContext } from '../../../../hooks/useLabelContext';
+import apiClient from '../../../../api/client';
 
 const AddLabelModal = () => {
     const [isOpened, setIsOpened] = useState(false);
@@ -34,8 +34,8 @@ const AddLabelModal = () => {
             return;
         }
         try {
-            const res = await axios.post(
-                `http://localhost:3700/api/boardRoute/${id}/label`,
+            const res = await apiClient.post(
+                `/api/boardRoute/${id}/label`,
                 { title, color },
                 {
                     headers: {

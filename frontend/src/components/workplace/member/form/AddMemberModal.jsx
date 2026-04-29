@@ -1,13 +1,14 @@
-import axios from 'axios';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuthContext } from '../../../../hooks/useAuthContext';
 import BtnGreen from '../../../Share/BtnGreen';
+import apiClient from '../../../../api/client';
 
 const AddMemberModal = () => {
     const [isOpened, setIsOpened] = useState(false);
     const [email, setEmail] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const clearForm = () => {
         setEmail('');
@@ -25,9 +26,13 @@ const AddMemberModal = () => {
             toast.error('Please fill email.');
             return;
         }
+        if (isSubmitting) {
+            return;
+        }
+        setIsSubmitting(true);
         try {
-            await axios.post(
-                `http://localhost:3700/api/inviteRoute/invite`,
+            await apiClient.post(
+                '/api/inviteRoute/invite',
                 { toEmail: email, boardId: id },
                 {
                     headers: {
@@ -36,14 +41,16 @@ const AddMemberModal = () => {
                     },
                 },
             );
+            clearForm();
+            toggleModal();
+            toast.success('Send invite successfully.');
         } catch (error) {
             toast.error(
                 error.response?.data?.error || 'An error occurred (FE).',
             );
+        } finally {
+            setIsSubmitting(false);
         }
-        clearForm();
-        toggleModal();
-        toast.success('Send invite successfully.');
     };
     return (
         <div>
@@ -78,7 +85,11 @@ const AddMemberModal = () => {
                         </div>
                         {/* footer */}
                         <div className="px-6 py-3 flex justify-end">
-                            <BtnGreen text="Invite" onClick={handleInvite} />
+                            <BtnGreen
+                                text="Invite"
+                                onClick={handleInvite}
+                                disabled={isSubmitting}
+                            />
                         </div>
                     </div>
                 </div>

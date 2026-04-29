@@ -2,7 +2,7 @@ import { useState } from "react";
 import BtnRed from "../../../Share/BtnRed";
 import BtnGray from "../../../Share/BtnGray";
 import { toast } from "react-toastify";
-import axios from "axios";
+import apiClient from "../../../../api/client";
 import { useAuthContext } from "../../../../hooks/useAuthContext";
 import { useMemberContext } from "../../../../hooks/useMemberContext";
 import { useParams } from "react-router-dom";
@@ -21,8 +21,8 @@ const DeleteMemberModal = ({ _id }) => {
   const handleDeleteMember = async (_id) => {
     toggleModal();
     try {
-      const res = await axios.delete(
-        `http://localhost:3700/api/boardRoute/${id}/member/${_id}`,
+      const res = await apiClient.delete(
+        `/api/boardRoute/${id}/member/${_id}`,
         {
           headers: {
             "Content-Type": "application/json",

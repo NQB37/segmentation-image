@@ -2,7 +2,6 @@ import LabelContainer from "../components/workplace/label/LabelContainer";
 import { useCanvasContext } from "../hooks/useCanvasContext";
 import ToolboxContainer from "../components/workplace/toolbox/ToolboxContainer";
 import CanvasContainer from "../components/workplace/canvas/CanvasContainer";
-import SegmentContainer from "../components/workplace/segmentation/SegmentContainer";
 import Header from "../components/Share/Header";
 import { useParams } from "react-router-dom";
 import useFetch from "../hooks/useFetch";
@@ -21,17 +20,14 @@ const BoardDetailPage = () => {
   const { handleLoadImage } = useCanvasContext();
 
   const { data, isLoading, error } = useFetch(
-    `http://localhost:3700/api/boardRoute/${id}`,
+    `/api/boardRoute/${id}`,
     {
       headers: { Authorization: `Bearer ${user?.token}` },
     }
   );
 
-  console.log(members);
-
   useEffect(() => {
     if (data) {
-      console.log(data);
       handleLoadImage("background", data.image);
       handleLoadImage("annotation", data.annotationImage);
       labelsDispatch({ type: "SET_LABELS", payload: data.labelsId });
@@ -57,10 +53,7 @@ const BoardDetailPage = () => {
                 <div className="h-1/3">
                   <LabelContainer labels={labels} />
                 </div>
-                {/* segmentation */}
-                {/* <div className="h-fit">
-                  <SegmentContainer />
-                </div> */}
+                {/* Segmentation controls stay hidden until inference and mask rendering are implemented. */}
                 {/* user */}
                 <div className="h-1/3">
                   <MemberContainer

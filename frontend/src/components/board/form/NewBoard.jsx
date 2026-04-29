@@ -4,7 +4,7 @@ import BtnGray from '../../Share/BtnGray';
 import { toast } from 'react-toastify';
 import { useBoardContext } from '../../../hooks/useBoardContext';
 import { useAuthContext } from '../../../hooks/useAuthContext';
-import axios from 'axios';
+import apiClient from '../../../api/client';
 
 const NewBoard = () => {
     const { dispatch } = useBoardContext();
@@ -52,8 +52,8 @@ const NewBoard = () => {
         let ownerId = 'temp';
         const board = { title, image, ownerId };
         try {
-            const res = await axios.post(
-                'http://localhost:3700/api/boardRoute',
+            const res = await apiClient.post(
+                '/api/boardRoute',
                 board,
                 {
                     headers: {

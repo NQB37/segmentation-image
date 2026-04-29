@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useLogout } from '../../hooks/useLogout';
 import { Link } from 'react-router-dom';
 import { useAuthContext } from '../../hooks/useAuthContext';
-import axios from 'axios';
 import { toast } from 'react-toastify';
+import apiClient from '../../api/client';
 
 const DropdownProfile = () => {
     const { user } = useAuthContext();
@@ -11,8 +11,8 @@ const DropdownProfile = () => {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const res = await axios.get(
-                    'http://localhost:3700/api/userRoute/profile',
+                const res = await apiClient.get(
+                    '/api/userRoute/profile',
                     {
                         headers: {
                             'Content-Type': 'application/json',

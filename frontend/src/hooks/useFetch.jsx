@@ -1,5 +1,5 @@
-import axios from 'axios';
 import { useEffect, useState } from 'react';
+import apiClient from '../api/client';
 
 const useFetch = (api, config = {}) => {
     const [data, setData] = useState(null);
@@ -10,7 +10,7 @@ const useFetch = (api, config = {}) => {
         if (!api) return;
         const fetchData = async () => {
             try {
-                const response = await axios.get(api, config);
+                const response = await apiClient.get(api, config);
                 setData(response.data);
                 setError(null);
             } catch (error) {
