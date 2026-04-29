@@ -1,11 +1,11 @@
-const express = require('express');
-const { requireAuth } = require('../middleware/requireAuth');
+import express from 'express';
+import { requireAuth } from '../middleware/requireAuth.js';
 const router = express.Router();
-const {
+import {
     getInvites,
     sendInvite,
     respondInvite,
-} = require('../controllers/inviteController');
+} from '../controllers/inviteController.js';
 
 // requre auth for all routes
 router.use(requireAuth);
@@ -19,4 +19,4 @@ router.post('/invite', sendInvite);
 // Respond to invite
 router.post('/invite/:id', respondInvite);
 
-module.exports = router;
+export default router;

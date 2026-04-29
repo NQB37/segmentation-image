@@ -1,10 +1,12 @@
-const env = require('./config/environement');
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const boardsRoute = require('./routes/boardRoute');
-const userRoute = require('./routes/userRoute');
-const inviteRoute = require('./routes/inviteRoute');
+import env from './config/environement.js';
+import express from 'express';
+import mongoose from 'mongoose';
+import cors from 'cors';
+import boardsRoute from './routes/boardRoute.js';
+import userRoute from './routes/userRoute.js';
+import inviteRoute from './routes/inviteRoute.js';
+import dns from 'dns';
+dns.setServers(['8.8.8.8', '1.1.1.1']);
 
 //express app
 const app = express();
@@ -17,8 +19,8 @@ app.use(express.json({ limit: '20mb' }));
 app.use(express.json());
 
 app.use((req, res, next) => {
-    console.log(req.path, req.method);
-    next();
+  console.log(req.path, req.method);
+  next();
 });
 
 // routes
@@ -28,13 +30,13 @@ app.use('/api/inviteRoute', inviteRoute);
 
 // connect to db
 mongoose
-    .connect(MONGO_URI)
-    .then(() => {
-        app.listen(APP_PORT, () => {
-            console.log(`listening on port ${APP_PORT}!!!`);
-        });
-        console.log('connect to mongo db successfully');
-    })
-    .catch((error) => {
-        console.log(error);
+  .connect(MONGO_URI)
+  .then(() => {
+    app.listen(APP_PORT, () => {
+      console.log(`listening on port ${APP_PORT}!!!`);
     });
+    console.log('connect to mongo db successfully');
+  })
+  .catch((error) => {
+    console.log(error);
+  });

@@ -1,8 +1,8 @@
-const mongoose = require('mongoose');
-const User = require('../models/userModel.js');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const validator = require('validator');
+import mongoose from 'mongoose';
+import User from '../models/userModel.js';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+import validator from 'validator';
 
 // create token base on user id and expire in 30 days
 const createToken = (_id) => {
@@ -198,7 +198,7 @@ const changeInfo = async (req, res) => {
     }
 };
 
-module.exports = {
+export {
     loginUser,
     signupUser,
     getUserById,
