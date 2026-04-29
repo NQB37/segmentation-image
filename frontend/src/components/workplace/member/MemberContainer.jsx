@@ -1,32 +1,32 @@
+import { ScrollArea } from "../../ui/scroll-area";
+import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar";
 import AddMemberModal from "./form/AddMemberModal";
 import DeleteMemberModal from "./form/DeleteMemberModal";
 
 const MemberContainer = ({ members }) => {
   return (
-    <div>
-      <div className="px-4 py-2 flex justify-between border-b border-black ">
-        <div className="font-bold">User</div>
+    <div className="flex flex-col h-full">
+      <div className="p-3 flex justify-between items-center border-b bg-muted/30">
+        <span className="text-xs font-semibold uppercase text-muted-foreground tracking-wider">Collaborators</span>
         <AddMemberModal />
       </div>
 
-      <div className="px-4 py-2 overflow-y-scroll hide-scrollbar space-y-2">
-        {members.map((member) => (
-          <div
-            key={member._id}
-            className="p-1 flex justify-between hover border-b border-black"
-          >
-            <div className="flex items-center space-x-2">
-              <img
-                src={member.avatar}
-                alt={member.name}
-                className="w-8 h-8 rounded-full"
-              />
-              <div>{member.name}</div>
+      <ScrollArea className="flex-grow">
+        <div className="p-2 space-y-1">
+          {members.map((member) => (
+            <div key={member._id} className="flex items-center justify-between p-2 rounded-md hover:bg-muted group">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-8 w-8 border">
+                  <AvatarImage src={member.avatar} alt={member.name} />
+                  <AvatarFallback>{member.name?.[0]?.toUpperCase() || '?'}</AvatarFallback>
+                </Avatar>
+                <div className="text-sm font-medium">{member.name}</div>
+              </div>
+              <DeleteMemberModal _id={member._id} />
             </div>
-            <DeleteMemberModal _id={member._id} />
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </ScrollArea>
     </div>
   );
 };

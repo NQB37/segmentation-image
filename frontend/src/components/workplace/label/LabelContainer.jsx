@@ -1,11 +1,13 @@
 import AddLabelModal from './form/AddLabelModal';
 import { useCanvasContext } from '../../../hooks/useCanvasContext';
-import BtnVisible from '../BtnVisible';
 import { useParams } from 'react-router-dom';
 import { useLabelContext } from '../../../hooks/useLabelContext';
 import { useAuthContext } from '../../../hooks/useAuthContext';
 import { toast } from 'react-toastify';
 import apiClient from '../../../api/client';
+import { ScrollArea } from '../../ui/scroll-area';
+import { Button } from '../../ui/button';
+import { Trash2, Eye, EyeOff } from 'lucide-react';
 
 const LabelContainer = ({ labels }) => {
     const {
@@ -13,89 +15,61 @@ const LabelContainer = ({ labels }) => {
         handleColorChange,
         annotationToggle,
         handleAnnotationToggle,
-        maskToggle,
-        handleMaskToggle,
     } = useCanvasContext();
 
-    // board id
     const { id } = useParams();
     const { labelsDispatch } = useLabelContext();
     const { user } = useAuthContext();
 
     const handleDeleteLabel = async (labelId) => {
         try {
-            const res = await apiClient.delete(
-                `/api/boardRoute/${id}/label/${labelId}`,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${user.token}`,
-                    },
-                },
-            );
+            const res = await apiClient.delete(`/api/boardRoute/${id}/label/${labelId}`, {
+                headers: { Authorization: `Bearer ${user.token}` },
+            });
             labelsDispatch({ type: 'DELETE_LABEL', payload: res.data });
         } catch (error) {
-            toast.error(
-                error.response?.data?.error || 'An error occurred (FE).',
-            );
+            toast.error(error.response?.data?.error || 'An error occurred.');
         }
     };
 
     return (
-        <div>
-            <div className="px-4 py-2 flex justify-between border-b border-black ">
-                <div className="font-bold">Label</div>
-                <div className="flex gap-3">
-                    <BtnVisible
-                        state={annotationToggle}
-                        onClick={handleAnnotationToggle}
-                    />
-                    <BtnVisible state={maskToggle} onClick={handleMaskToggle} />
+        <div className="flex flex-col h-full">
+            <div className="p-3 flex justify-between items-center border-b bg-muted/30">
+                <span className="text-xs font-semibold uppercase text-muted-foreground tracking-wider">Project Labels</span>
+                <div className="flex gap-1">
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleAnnotationToggle} title={annotationToggle ? "Hide Annotations" : "Show Annotations"}>
+                        {annotationToggle ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                    </Button>
                     <AddLabelModal />
                 </div>
             </div>
 
-            <div className="p-2 overflow-y-scroll hide-scrollbar space-y-2">
-                {labels.map((label) => {
-                    return (
-                        <label
+            <ScrollArea className="flex-grow">
+                <div className="p-2 space-y-1">
+                    {labels.map((label) => (
+                        <div
                             key={label._id}
-                            htmlFor={label.title}
-                            className={`px-2 flex justify-between items-center ${
-                                color === label.color
-                                    ? 'bg-blue-200'
-                                    : 'bg-transparent'
+                            onClick={() => handleColorChange({ target: { value: label.color } })}
+                            className={`flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors group ${
+                                color === label.color ? 'bg-accent text-accent-foreground' : 'hover:bg-muted'
                             }`}
                         >
-                            <input
-                                type="checkbox"
-                                name={label.title}
-                                id={label.title}
-                                onChange={handleColorChange}
-                                value={label.color}
-                                checked={color === label.color}
-                                className="hidden"
-                            />
-                            <p>{label.title}</p>
-                            <div className="flex gap-2 item-center">
-                                <div
-                                    className={`w-4 border border-black`}
-                                    style={{ backgroundColor: label.color }}
-                                />
-
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleDeleteLabel(label._id);
-                                    }}
-                                >
-                                    <i className="fa-solid fa-trash"></i>
-                                </button>
+                            <div className="flex items-center gap-3">
+                                <div className="w-3 h-3 rounded-full border border-black/10" style={{ backgroundColor: label.color }} />
+                                <span className="text-sm font-medium">{label.title}</span>
                             </div>
-                        </label>
-                    );
-                })}
-            </div>
+                            <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={(e) => { e.stopPropagation(); handleDeleteLabel(label._id); }}
+                            >
+                                <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                        </div>
+                    ))}
+                </div>
+            </ScrollArea>
         </div>
     );
 };
