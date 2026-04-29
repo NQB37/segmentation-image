@@ -98,8 +98,10 @@ export const CanvasProvider = ({ children }) => {
         }
     };
     const handleBrushSize = (e) => {
-        e.preventDefault();
-        setBrushSize(e.target.value);
+        if (e && typeof e.preventDefault === 'function') {
+            e.preventDefault();
+        }
+        setBrushSize(e.target ? e.target.value : e);
     };
     // handle fill color
     const handleFill = () => {
@@ -115,8 +117,10 @@ export const CanvasProvider = ({ children }) => {
         setEraserSelected(true);
     };
     const handleEraserSize = (e) => {
-        e.preventDefault();
-        setEraserSize(e.target.value);
+        if (e && typeof e.preventDefault === 'function') {
+            e.preventDefault();
+        }
+        setEraserSize(e.target ? e.target.value : e);
     };
 
     const startPan = (e) => {
