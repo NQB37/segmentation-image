@@ -17,7 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const DeleteMemberModal = ({ _id }) => {
+const DeleteMemberModal = ({ _id, name }) => {
   const [open, setOpen] = useState(false);
   const { id } = useParams();
   const { membersDispatch } = useMemberContext();
@@ -62,7 +62,7 @@ const DeleteMemberModal = ({ _id }) => {
             <div className="space-y-2">
               <DialogTitle className="text-2xl font-bold tracking-tight">Remove Member?</DialogTitle>
               <DialogDescription className="text-base text-muted-foreground">
-                Are you sure you want to remove this user from the project? They will lose all access immediately.
+                Are you sure you want to remove <span className="font-semibold text-foreground">{name}</span> from this project? They will lose all access immediately.
               </DialogDescription>
             </div>
           </DialogHeader>
