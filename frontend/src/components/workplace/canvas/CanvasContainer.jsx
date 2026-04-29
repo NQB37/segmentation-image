@@ -5,23 +5,42 @@ import { Badge } from "../../ui/badge";
 const CanvasContainer = () => {
   const {
     containerRef, bgCanvasRef, canvasRef, maskCanvasRef,
-    scale, pos, totalDrawnLength,
+    scale, pos, totalDrawnLength, canvasSize,
     startPan, pan, endPan, handleWheelZoom, handleCanvasClick,
     startDrawing, draw, endDrawing, annotationToggle, maskToggle,
   } = useCanvasContext();
 
   useEffect(() => {
-    const container = bgCanvasRef.current.parentNode;
-    const width = container.offsetWidth;
-    const height = container.offsetHeight;
+    if (!containerRef.current) return;
+    const parent = containerRef.current.parentElement;
+    if (!parent) return;
 
-    bgCanvasRef.current.width = width;
-    bgCanvasRef.current.height = height;
-    canvasRef.current.width = width;
-    canvasRef.current.height = height;
-    maskCanvasRef.current.width = width;
-    maskCanvasRef.current.height = height;
-  }, []);
+    const observer = new ResizeObserver(() => {
+      // Logic to keep scale/pan consistent on resize can go here
+      // We explicitly do NOT change the internal canvas resolution here
+    });
+
+    observer.observe(parent);
+    return () => observer.disconnect();
+  }, [containerRef]);
+
+  // Ensure canvas resolution matches image size even if loaded before mount
+  useEffect(() => {
+    if (canvasSize.width > 0) {
+      if (bgCanvasRef.current) {
+        bgCanvasRef.current.width = canvasSize.width;
+        bgCanvasRef.current.height = canvasSize.height;
+      }
+      if (canvasRef.current) {
+        canvasRef.current.width = canvasSize.width;
+        canvasRef.current.height = canvasSize.height;
+      }
+      if (maskCanvasRef.current) {
+        maskCanvasRef.current.width = canvasSize.width;
+        maskCanvasRef.current.height = canvasSize.height;
+      }
+    }
+  }, [canvasSize, bgCanvasRef, canvasRef, maskCanvasRef]);
 
   return (
     <div
