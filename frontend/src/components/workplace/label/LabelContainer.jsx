@@ -49,7 +49,14 @@ const LabelContainer = ({ labels }) => {
                     {labels.map((label) => (
                         <div
                             key={label._id}
+                            tabIndex="0"
+                            role="button"
                             onClick={() => handleColorChange({ target: { value: label.color } })}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    handleColorChange({ target: { value: label.color } });
+                                }
+                            }}
                             className={`flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors group ${
                                 color === label.color ? 'bg-accent text-accent-foreground' : 'hover:bg-muted'
                             }`}

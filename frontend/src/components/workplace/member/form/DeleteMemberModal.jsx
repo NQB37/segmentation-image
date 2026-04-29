@@ -6,6 +6,7 @@ import apiClient from "../../../../api/client";
 import { useAuthContext } from "../../../../hooks/useAuthContext";
 import { useMemberContext } from "../../../../hooks/useMemberContext";
 import { useParams } from "react-router-dom";
+import { Trash2, X } from "lucide-react";
 
 const DeleteMemberModal = ({ _id }) => {
   const [isOpened, setIsOpened] = useState(false);
@@ -38,8 +39,8 @@ const DeleteMemberModal = ({ _id }) => {
 
   return (
     <div>
-      <button onClick={toggleModal}>
-        <i className="fa-solid fa-trash"></i>
+      <button onClick={toggleModal} className="hover:text-red-500 transition-colors">
+        <Trash2 className="w-4 h-4" />
       </button>
       {isOpened && (
         <div className="fixed inset-0 z-50 flex justify-center items-center w-full h-full bg-black bg-opacity-50">
@@ -48,7 +49,7 @@ const DeleteMemberModal = ({ _id }) => {
             <div className="p-6 flex justify-between">
               <p className="font-semibold">Delete</p>
               <button onClick={toggleModal}>
-                <i className="fa-solid fa-x"></i>
+                <X className="w-5 h-5" />
               </button>
             </div>
             {/* body */}
@@ -57,7 +58,7 @@ const DeleteMemberModal = ({ _id }) => {
             </div>
             {/* footer */}
             <div className="p-6 flex gap-6">
-              <BtnGray text="Cancle" onClick={toggleModal} />
+              <BtnGray text="Cancel" onClick={toggleModal} />
               <BtnRed
                 text="Delete"
                 onClick={(e) => {
