@@ -3,6 +3,7 @@ import { toast } from 'react-toastify';
 import BtnGray from '../../Share/BtnGray';
 import BtnGreen from '../../Share/BtnGreen';
 import { useAuthContext } from '../../../hooks/useAuthContext';
+import apiClient from '../../../api/client';
 
 const ChangeAvatar = () => {
     const { user } = useAuthContext();
@@ -40,27 +41,17 @@ const ChangeAvatar = () => {
             return;
         }
         try {
-            const response = await fetch(
-                'http://localhost:3700/api/userRoute/change-avatar',
+            const response = await apiClient.post(
+                '/api/userRoute/change-avatar',
+                { image },
                 {
-                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${user.token}`,
                     },
-                    body: JSON.stringify({ image }),
                 },
             );
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(
-                    errorData.message ||
-                        'Failed to update image. Please try again.',
-                );
-            }
-
-            const data = await response.json();
+            const data = response.data;
             toast.success(
                 data.message || 'Profile image updated successfully.',
             );
@@ -69,7 +60,10 @@ const ChangeAvatar = () => {
         } catch (error) {
             console.error('Error updating profile image:', error);
             toast.error(
-                error.message || 'Failed to update image. Please try again.',
+                error.response?.data?.error ||
+                    error.response?.data?.message ||
+                    error.message ||
+                    'Failed to update image. Please try again.',
             );
         }
     };

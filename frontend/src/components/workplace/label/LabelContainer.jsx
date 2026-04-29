@@ -4,8 +4,8 @@ import BtnVisible from '../BtnVisible';
 import { useParams } from 'react-router-dom';
 import { useLabelContext } from '../../../hooks/useLabelContext';
 import { useAuthContext } from '../../../hooks/useAuthContext';
-import axios from 'axios';
 import { toast } from 'react-toastify';
+import apiClient from '../../../api/client';
 
 const LabelContainer = ({ labels }) => {
     const {
@@ -13,6 +13,8 @@ const LabelContainer = ({ labels }) => {
         handleColorChange,
         annotationToggle,
         handleAnnotationToggle,
+        maskToggle,
+        handleMaskToggle,
     } = useCanvasContext();
 
     // board id
@@ -22,8 +24,8 @@ const LabelContainer = ({ labels }) => {
 
     const handleDeleteLabel = async (labelId) => {
         try {
-            const res = await axios.delete(
-                `http://localhost:3700/api/boardRoute/${id}/label/${labelId}`,
+            const res = await apiClient.delete(
+                `/api/boardRoute/${id}/label/${labelId}`,
                 {
                     headers: {
                         'Content-Type': 'application/json',
@@ -48,6 +50,7 @@ const LabelContainer = ({ labels }) => {
                         state={annotationToggle}
                         onClick={handleAnnotationToggle}
                     />
+                    <BtnVisible state={maskToggle} onClick={handleMaskToggle} />
                     <AddLabelModal />
                 </div>
             </div>

@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { toast } from 'react-toastify';
 import BtnGray from '../../Share/BtnGray';
 import BtnGreen from '../../Share/BtnGreen';
-import axios from 'axios';
 import { useAuthContext } from '../../../hooks/useAuthContext';
 import BtnBlue from '../../Share/BtnBlue';
+import apiClient from '../../../api/client';
 
 const ChangePassword = () => {
     const { user } = useAuthContext();
@@ -36,8 +36,8 @@ const ChangePassword = () => {
         const newInfo = { currentPassword, newPassword, confirmPassword };
 
         try {
-            const res = await axios.patch(
-                'http://localhost:3700/api/userRoute/change-password',
+            const res = await apiClient.patch(
+                '/api/userRoute/change-password',
                 newInfo,
                 {
                     headers: {

@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { useBoardContext } from '../../../hooks/useBoardContext';
 import BtnRed from '../../Share/BtnRed';
 import { useAuthContext } from '../../../hooks/useAuthContext';
-import axios from 'axios';
+import apiClient from '../../../api/client';
 
 const DeleteBoard = ({ _id }) => {
     const { dispatch } = useBoardContext();
@@ -20,8 +20,8 @@ const DeleteBoard = ({ _id }) => {
             return;
         }
         try {
-            const res = await axios.delete(
-                `http://localhost:3700/api/boardRoute/${_id}`,
+            const res = await apiClient.delete(
+                `/api/boardRoute/${_id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${user.token}`,

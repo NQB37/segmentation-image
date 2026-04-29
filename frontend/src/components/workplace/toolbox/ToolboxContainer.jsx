@@ -1,4 +1,4 @@
-import axios from "axios";
+import apiClient from "../../../api/client";
 import { useCanvasContext } from "../../../hooks/useCanvasContext";
 import CustomBtn from "../../CustomBtn";
 import CustomZoom from "../../CustomZoom";
@@ -40,8 +40,8 @@ const ToolboxContainer = () => {
   const handleSaveAnnotation = async () => {
     const dataURL = canvasRef.current.toDataURL("image/png", 1.0);
     try {
-      const res = await axios.patch(
-        `http://localhost:3700/api/boardRoute/${id}`,
+      const res = await apiClient.patch(
+        `/api/boardRoute/${id}`,
         { annotationImage: dataURL },
         {
           headers: {

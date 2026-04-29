@@ -11,7 +11,7 @@ const BoardPage = () => {
     const { boards, dispatch } = useBoardContext();
     const { user } = useAuthContext();
     const { data, isLoading, error } = useFetch(
-        'http://localhost:3700/api/boardRoute',
+        '/api/boardRoute',
         {
             headers: { Authorization: `Bearer ${user?.token}` },
         },

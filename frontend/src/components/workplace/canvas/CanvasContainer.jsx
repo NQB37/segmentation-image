@@ -59,15 +59,11 @@ const CanvasContainer = () => {
           className={`z-0 absolute top-0 left-0 size-full `}
         />
         {/* Mark canvas  */}
-        {/* <canvas
-                    ref={maskCanvasRef}
-                    className={`z-10 absolute top-0 left-0 size-full ${
-                        maskToggle ? '' : 'hidden'
-                    }`}
-                /> */}
         <canvas
           ref={maskCanvasRef}
-          className={`z-10 absolute top-0 left-0 size-full opacity-25`}
+          className={`z-10 absolute top-0 left-0 size-full opacity-25 ${
+            maskToggle ? '' : 'hidden'
+          }`}
         />
         {/* Annotation canvas overlay */}
         <canvas

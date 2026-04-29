@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import Header from '../components/Share/Header';
 import ChangePassword from '../components/profile/form/ChangePassword';
 import ChangeAvatar from '../components/profile/form/ChangeAvatar';
-import axios from 'axios';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { toast } from 'react-toastify';
 import BtnBlue from '../components/Share/BtnBlue';
+import apiClient from '../api/client';
 
 const ProfilePage = () => {
     const { user } = useAuthContext();
@@ -16,8 +16,8 @@ const ProfilePage = () => {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const res = await axios.get(
-                    'http://localhost:3700/api/userRoute/profile',
+                const res = await apiClient.get(
+                    '/api/userRoute/profile',
                     {
                         headers: {
                             'Content-Type': 'application/json',
@@ -41,8 +41,8 @@ const ProfilePage = () => {
             return;
         }
         try {
-            const res = await axios.patch(
-                'http://localhost:3700/api/userRoute/change-info',
+            const res = await apiClient.patch(
+                '/api/userRoute/change-info',
                 { name: name },
                 {
                     headers: {

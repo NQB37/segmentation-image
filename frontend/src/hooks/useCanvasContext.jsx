@@ -320,7 +320,7 @@ export const CanvasProvider = ({ children }) => {
     // segmentation
     const [maskToggle, setMaskToggle] = useState(false);
     const handleMaskToggle = () => {
-        setAnnotationToggle(!annotationToggle);
+        setMaskToggle((value) => !value);
     };
 
     return (

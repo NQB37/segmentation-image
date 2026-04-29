@@ -4,15 +4,16 @@ import useFetch from '../../hooks/useFetch';
 import Loading from './Loading';
 import BtnGreen from './BtnGreen';
 import BtnGray from './BtnGray';
-import axios from 'axios';
 import { toast } from 'react-toastify';
+import apiClient from '../../api/client';
 
 const Notification = () => {
     const { user } = useAuthContext();
     const [isOpen, setIsOpen] = useState(false);
+    const [pendingInviteId, setPendingInviteId] = useState(null);
 
     const { data, isLoading, error } = useFetch(
-        'http://localhost:3700/api/inviteRoute',
+        '/api/inviteRoute',
         {
             headers: { Authorization: `Bearer ${user?.token}` },
         },
@@ -26,15 +27,23 @@ const Notification = () => {
         console.log('Finish loading board');
     }, [data]);
 
+    const fetchErrorMessage =
+        error?.response?.data?.error ||
+        error?.message ||
+        'Failed to load notifications.';
+
     const toggleDropdown = () => {
         setIsOpen(!isOpen);
     };
 
     const handleRespond = async (_id, status) => {
+        if (pendingInviteId) {
+            return;
+        }
+        setPendingInviteId(_id);
         try {
-            console.log(_id + ' ' + status);
-            const res = await axios.post(
-                `http://localhost:3700/api/inviteRoute/invite/${_id}`,
+            await apiClient.post(
+                `/api/inviteRoute/invite/${_id}`,
                 { inviteId: _id, status },
                 {
                     headers: {
@@ -42,12 +51,14 @@ const Notification = () => {
                     },
                 },
             );
+            setNotifications((prev) => prev.filter((n) => n._id !== _id));
         } catch (error) {
             toast.error(
                 error.response?.data?.error || 'An error occurred (FE).',
             );
+        } finally {
+            setPendingInviteId(null);
         }
-        setNotifications((prev) => prev.filter((n) => n._id !== _id));
     };
 
     return (
@@ -70,6 +81,10 @@ const Notification = () => {
                 >
                     {isLoading ? (
                         <Loading />
+                    ) : error ? (
+                        <div className="flex items-center justify-center text-nowrap">
+                            <p>{fetchErrorMessage}</p>
+                        </div>
                     ) : (
                         <div>
                             {notifications.length !== 0 ? (
@@ -93,6 +108,9 @@ const Notification = () => {
                                                         <BtnGreen
                                                             text="Accept"
                                                             width={'w-fit'}
+                                                            disabled={
+                                                                !!pendingInviteId
+                                                            }
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 handleRespond(
@@ -104,6 +122,9 @@ const Notification = () => {
                                                         <BtnGray
                                                             text="Cancel"
                                                             width={'w-fit'}
+                                                            disabled={
+                                                                !!pendingInviteId
+                                                            }
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 handleRespond(
