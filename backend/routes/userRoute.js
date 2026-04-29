@@ -8,6 +8,7 @@ import {
     getUserById,
     changeInfo,
 } from '../controllers/userController.js';
+
 const router = express.Router();
 
 // login route
