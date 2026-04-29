@@ -67,6 +67,7 @@ const ToolboxContainer = () => {
           size="icon"
           className="h-10 w-10"
           onClick={onClick}
+          aria-label={title}
         >
           <Icon className="h-5 w-5" />
         </Button>
