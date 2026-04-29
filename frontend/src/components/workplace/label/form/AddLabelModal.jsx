@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import BtnGreen from '../../../Share/BtnGreen';
 import { useLabelContext } from '../../../../hooks/useLabelContext';
 import apiClient from '../../../../api/client';
+import { Plus, X } from 'lucide-react';
 
 const AddLabelModal = () => {
     const [isOpened, setIsOpened] = useState(false);
@@ -57,24 +58,28 @@ const AddLabelModal = () => {
 
     return (
         <div>
-            <button onClick={toggleModal}>
-                <i className="fa-solid fa-plus"></i>{' '}
+            <button 
+                onClick={toggleModal}
+                className="flex items-center justify-center h-8 w-8 rounded-md hover:bg-muted transition-colors"
+                title="Add Label"
+            >
+                <Plus className="h-4 w-4" />
             </button>
             {isOpened && (
                 <div className="fixed inset-0 z-50 flex justify-center items-center w-full h-full bg-black bg-opacity-50">
-                    <div className="size-fit bg-white flex flex-col justify-between">
+                    <div className="size-fit bg-white flex flex-col justify-between rounded-lg shadow-lg overflow-hidden">
                         {/* header */}
-                        <div className="p-6 flex justify-between">
-                            <p className="font-semibold">Add Label</p>
-                            <button onClick={toggleModal}>
-                                <i className="fa-solid fa-x"></i>
+                        <div className="p-6 flex justify-between items-center bg-muted/10">
+                            <p className="font-semibold text-lg">Add Label</p>
+                            <button onClick={toggleModal} className="text-muted-foreground hover:text-foreground transition-colors">
+                                <X className="h-5 w-5" />
                             </button>
                         </div>
                         {/* body */}
-                        <div className="grow px-6 py-3 border-y border-[#ECECEC] flex flex-col gap-2">
-                            <div className="flex justify-between">
-                                <label htmlFor="title" className="w-12">
-                                    Title:
+                        <div className="grow px-6 py-4 border-y border-border flex flex-col gap-4">
+                            <div className="flex flex-col gap-1.5">
+                                <label htmlFor="title" className="text-sm font-medium">
+                                    Title
                                 </label>
                                 <input
                                     type="text"
@@ -82,12 +87,13 @@ const AddLabelModal = () => {
                                     id="title"
                                     value={title}
                                     onChange={(e) => setTitle(e.target.value)}
-                                    className="w-80 border-b border-black outline-none"
+                                    className="flex h-9 w-80 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                                    placeholder="Enter label title"
                                 />
                             </div>
-                            <div className="flex justify-between items-center">
-                                <label htmlFor="color" className="w-12">
-                                    Color:
+                            <div className="flex flex-col gap-1.5">
+                                <label htmlFor="color" className="text-sm font-medium">
+                                    Color
                                 </label>
                                 <input
                                     type="color"
@@ -95,16 +101,22 @@ const AddLabelModal = () => {
                                     id="color"
                                     value={color}
                                     onChange={(e) => setColor(e.target.value)}
-                                    className="w-20 border-b border-black"
+                                    className="h-10 w-20 rounded-md border border-input bg-transparent p-1 shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                                 />
                             </div>
                         </div>
                         {/* footer */}
-                        <div className="px-4 py-2 flex justify-end">
+                        <div className="px-6 py-4 flex justify-end gap-3 bg-muted/10">
+                            <button 
+                                onClick={toggleModal}
+                                className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
+                            >
+                                Cancel
+                            </button>
                             <BtnGreen
                                 onClick={handleAdd}
                                 text="Add"
-                                width="w-20"
+                                width="w-24"
                             />
                         </div>
                     </div>
