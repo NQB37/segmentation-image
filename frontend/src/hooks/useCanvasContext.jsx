@@ -29,6 +29,7 @@ export const CanvasProvider = ({ children }) => {
     const [scale, setScale] = useState(1);
     const [origin, setOrigin] = useState({ x: 0, y: 0 });
     const [totalDrawnLength, setTotalDrawnLength] = useState(0);
+    const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
 
     useEffect(() => {
         const container = containerRef.current;
@@ -57,28 +58,28 @@ export const CanvasProvider = ({ children }) => {
         if (!image) return;
         const img = new Image();
         img.onload = () => {
-            if (type === 'background') {
-                const bgCanvas = bgCanvasRef.current;
-                if (!bgCanvas) {
-                    console.error('Canvas ref is null');
-                    return;
-                }
-                const ctx = bgCanvas.getContext('2d');
+            const bgCanvas = bgCanvasRef.current;
+            const annotationCanvas = canvasRef.current;
+            const maskCanvas = maskCanvasRef.current;
+
+            if (bgCanvas && annotationCanvas && maskCanvas) {
+                // Synchronize all canvas dimensions to the loaded image
                 bgCanvas.width = img.width;
                 bgCanvas.height = img.height;
-                ctx.drawImage(img, 0, 0);
-            } else if (type === 'annotation') {
-                const annotationCanvas = canvasRef.current;
-                if (!annotationCanvas) {
-                    console.error('Canvas ref is null');
-                    return;
-                }
-                const ctx = annotationCanvas.getContext('2d');
                 annotationCanvas.width = img.width;
                 annotationCanvas.height = img.height;
-                ctx.drawImage(img, 0, 0);
-            } else {
-                // handle segment
+                maskCanvas.width = img.width;
+                maskCanvas.height = img.height;
+
+                setCanvasSize({ width: img.width, height: img.height });
+
+                if (type === 'background') {
+                    const ctx = bgCanvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                } else if (type === 'annotation') {
+                    const ctx = annotationCanvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                }
             }
         };
         img.src = image;
@@ -350,6 +351,7 @@ export const CanvasProvider = ({ children }) => {
                 totalDrawnLength,
                 scale,
                 origin,
+                canvasSize,
                 labels,
                 annotationToggle,
                 maskToggle,
