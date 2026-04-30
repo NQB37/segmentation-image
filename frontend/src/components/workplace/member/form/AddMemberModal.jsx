@@ -2,27 +2,43 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuthStore } from '../../../../stores/useAuthStore';
-import BtnGreen from '../../../Share/BtnGreen';
 import apiClient from '../../../../api/client';
+import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Mail, Plus, UserPlus } from 'lucide-react';
 
 const AddMemberModal = () => {
-    const [isOpened, setIsOpened] = useState(false);
+    const [isModalOpened, setIsModalOpened] = useState(false);
     const [email, setEmail] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const clearForm = () => {
         setEmail('');
     };
-    const toggleModal = () => {
-        setIsOpened(!isOpened);
+    const handleOpenChange = (open) => {
+        setIsModalOpened(open);
+        if (!open) {
+            clearForm();
+        }
     };
 
     // get board id
     const { id } = useParams();
     const user = useAuthStore((state) => state.user);
 
-    const handleInvite = async () => {
-        if (!email) {
+    const handleInvite = async (e) => {
+        e.preventDefault();
+        if (!email.trim()) {
             toast.error('Please fill email.');
             return;
         }
@@ -33,7 +49,7 @@ const AddMemberModal = () => {
         try {
             await apiClient.post(
                 '/api/inviteRoute/invite',
-                { toEmail: email, boardId: id },
+                { toEmail: email.trim(), boardId: id },
                 {
                     headers: {
                         'Content-Type': 'application/json',
@@ -41,8 +57,7 @@ const AddMemberModal = () => {
                     },
                 },
             );
-            clearForm();
-            toggleModal();
+            handleOpenChange(false);
             toast.success('Send invite successfully.');
         } catch (error) {
             toast.error(
@@ -53,48 +68,67 @@ const AddMemberModal = () => {
         }
     };
     return (
-        <div>
-            <button onClick={toggleModal}>
-                <i className="fa-solid fa-plus"></i>{' '}
-            </button>
-            {isOpened && (
-                <div className="fixed inset-0 z-50 flex justify-center items-center w-full h-full bg-black bg-opacity-50">
-                    <div className="size-fit bg-white flex flex-col justify-between">
-                        {/* header */}
-                        <div className="p-6 flex justify-between">
-                            <p className="font-semibold">Invite User</p>
-                            <button onClick={toggleModal}>
-                                <i className="fa-solid fa-x"></i>
-                            </button>
+        <Dialog open={isModalOpened} onOpenChange={handleOpenChange}>
+            <DialogTrigger asChild>
+                <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Invite member"
+                    title="Invite member"
+                >
+                    <Plus className="size-4" />
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+                <form onSubmit={handleInvite}>
+                    <DialogHeader className="pr-8">
+                        <div className="mb-1 flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                            <UserPlus className="size-4" />
                         </div>
-                        {/* body */}
-                        <div className="grow px-6 py-3 border-y border-[#ECECEC] flex flex-col gap-2">
-                            <div className="flex justify-between">
-                                <label htmlFor="email" className="w-12">
-                                    Email:
-                                </label>
-                                <input
-                                    type="text"
+                        <DialogTitle>Invite member</DialogTitle>
+                        <DialogDescription>
+                            Send an email invitation to collaborate on this
+                            project.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="grid gap-4 py-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="member-email">
+                                Email address
+                                <span className="text-destructive">*</span>
+                            </Label>
+                            <div className="relative">
+                                <Mail className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                                <Input
+                                    id="member-email"
                                     name="email"
-                                    id="email"
+                                    type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-80 border-b border-black outline-none"
+                                    className="pl-8"
+                                    placeholder="teammate@example.com"
                                 />
                             </div>
                         </div>
-                        {/* footer */}
-                        <div className="px-6 py-3 flex justify-end">
-                            <BtnGreen
-                                text="Invite"
-                                onClick={handleInvite}
-                                disabled={isSubmitting}
-                            />
-                        </div>
                     </div>
-                </div>
-            )}
-        </div>
+
+                    <DialogFooter>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => handleOpenChange(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button type="submit" disabled={isSubmitting}>
+                            {isSubmitting ? 'Sending...' : 'Send invite'}
+                        </Button>
+                    </DialogFooter>
+                </form>
+            </DialogContent>
+        </Dialog>
     );
 };
 

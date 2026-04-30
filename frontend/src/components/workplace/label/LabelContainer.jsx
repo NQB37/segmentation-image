@@ -1,13 +1,9 @@
 import AddLabelModal from './form/AddLabelModal';
+import DeleteLabelModal from './form/DeleteLabelModal';
 import { useCanvasContext } from '../../../hooks/useCanvasContext';
-import { useParams } from 'react-router-dom';
-import { useLabelStore } from '../../../stores/useLabelStore';
-import { useAuthStore } from '../../../stores/useAuthStore';
-import { toast } from 'react-toastify';
-import apiClient from '../../../api/client';
 import { ScrollArea } from '../../ui/scroll-area';
 import { Button } from '../../ui/button';
-import { Trash2, Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 
 const LabelContainer = ({ labels }) => {
     const {
@@ -16,21 +12,6 @@ const LabelContainer = ({ labels }) => {
         annotationToggle,
         handleAnnotationToggle,
     } = useCanvasContext();
-
-    const { id } = useParams();
-    const deleteLabel = useLabelStore((state) => state.deleteLabel);
-    const user = useAuthStore((state) => state.user);
-
-    const handleDeleteLabel = async (labelId) => {
-        try {
-            const res = await apiClient.delete(`/api/boardRoute/${id}/label/${labelId}`, {
-                headers: { Authorization: `Bearer ${user.token}` },
-            });
-            deleteLabel(res.data);
-        } catch (error) {
-            toast.error(error.response?.data?.error || 'An error occurred.');
-        }
-    };
 
     return (
         <div className="flex flex-col h-full">
@@ -76,14 +57,7 @@ const LabelContainer = ({ labels }) => {
                                 {color === label.color && (
                                     <span className="text-[10px] font-bold uppercase text-primary px-1.5 py-0.5 bg-primary/10 rounded mr-1">Active</span>
                                 )}
-                                <Button 
-                                    variant="ghost" 
-                                    size="icon" 
-                                    className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
-                                    onClick={(e) => { e.stopPropagation(); handleDeleteLabel(label._id); }}
-                                >
-                                    <Trash2 className="h-3.5 w-3.5" />
-                                </Button>
+                                <DeleteLabelModal label={label} />
                             </div>
                         </div>
                     ))}

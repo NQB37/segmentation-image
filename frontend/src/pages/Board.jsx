@@ -69,13 +69,13 @@ const BoardPage = () => {
               })}
             </div>
           ) : (
-            <Card className='min-h-[360px] items-center justify-center border-dashed text-center'>
-              <CardHeader className='items-center'>
+            <Card className='min-h-[360px] items-center justify-center border-dashed px-4 text-center'>
+              <CardHeader className='w-full max-w-md items-center justify-items-center gap-2'>
                 <div className='flex size-12 items-center justify-center rounded-lg bg-primary/10 text-primary'>
                   <Images className='size-5' />
                 </div>
                 <CardTitle>No projects yet</CardTitle>
-                <CardDescription className='max-w-md'>
+                <CardDescription>
                   Create your first segmentation project by uploading an image
                   and giving it a clear name.
                 </CardDescription>

@@ -2,22 +2,50 @@ import { useState } from 'react';
 import { useAuthStore } from '../../../../stores/useAuthStore';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import BtnGreen from '../../../Share/BtnGreen';
 import { useLabelStore } from '../../../../stores/useLabelStore';
 import apiClient from '../../../../api/client';
-import { Plus, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Check, Palette, Plus, Tag } from 'lucide-react';
+
+const LABEL_COLORS = [
+    '#EF4444',
+    '#F97316',
+    '#F59E0B',
+    '#10B981',
+    '#14B8A6',
+    '#3B82F6',
+    '#6366F1',
+    '#8B5CF6',
+    '#EC4899',
+];
 
 const AddLabelModal = () => {
-    const [isOpened, setIsOpened] = useState(false);
+    const [isModalOpened, setIsModalOpened] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [title, setTitle] = useState('');
-    const [color, setColor] = useState('');
+    const [color, setColor] = useState(LABEL_COLORS[0]);
 
     const clearForm = () => {
         setTitle('');
-        setColor('');
+        setColor(LABEL_COLORS[0]);
     };
-    const toggleModal = () => {
-        setIsOpened(!isOpened);
+
+    const handleOpenChange = (open) => {
+        setIsModalOpened(open);
+        if (!open) {
+            clearForm();
+        }
     };
 
     // board id
@@ -25,19 +53,25 @@ const AddLabelModal = () => {
     const createLabel = useLabelStore((state) => state.createLabel);
     const user = useAuthStore((state) => state.user);
 
-    const handleAdd = async () => {
-        if (!title) {
+    const handleAdd = async (e) => {
+        e.preventDefault();
+        if (!title.trim()) {
             toast.error('Please fill title.');
             return;
         }
-        if (!color) {
+        if (!color.trim()) {
             toast.error('Please select color.');
             return;
         }
+        if (isSubmitting) {
+            return;
+        }
+
+        setIsSubmitting(true);
         try {
             const res = await apiClient.post(
                 `/api/boardRoute/${id}/label`,
-                { title, color },
+                { title: title.trim(), color },
                 {
                     headers: {
                         'Content-Type': 'application/json',
@@ -46,83 +80,118 @@ const AddLabelModal = () => {
                 },
             );
             createLabel(res.data);
+            toast.success('Create label successfully.');
+            handleOpenChange(false);
         } catch (error) {
             toast.error(
                 error.response?.data?.error || 'An error occurred (FE).',
             );
+        } finally {
+            setIsSubmitting(false);
         }
-
-        clearForm();
-        toggleModal();
     };
 
     return (
-        <div>
-            <button 
-                onClick={toggleModal}
-                className="flex items-center justify-center h-8 w-8 rounded-md hover:bg-muted transition-colors"
-                title="Add Label"
-            >
-                <Plus className="h-4 w-4" />
-            </button>
-            {isOpened && (
-                <div className="fixed inset-0 z-50 flex justify-center items-center w-full h-full bg-black bg-opacity-50">
-                    <div className="size-fit bg-white flex flex-col justify-between rounded-lg shadow-lg overflow-hidden">
-                        {/* header */}
-                        <div className="p-6 flex justify-between items-center bg-muted/10">
-                            <p className="font-semibold text-lg">Add Label</p>
-                            <button onClick={toggleModal} className="text-muted-foreground hover:text-foreground transition-colors">
-                                <X className="h-5 w-5" />
-                            </button>
+        <Dialog open={isModalOpened} onOpenChange={handleOpenChange}>
+            <DialogTrigger asChild>
+                <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Add label"
+                    title="Add label"
+                >
+                    <Plus className="size-4" />
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+                <form onSubmit={handleAdd}>
+                    <DialogHeader className="pr-8">
+                        <div className="mb-1 flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                            <Tag className="size-4" />
                         </div>
-                        {/* body */}
-                        <div className="grow px-6 py-4 border-y border-border flex flex-col gap-4">
-                            <div className="flex flex-col gap-1.5">
-                                <label htmlFor="title" className="text-sm font-medium">
-                                    Title
-                                </label>
-                                <input
-                                    type="text"
-                                    name="title"
-                                    id="title"
-                                    value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
-                                    className="flex h-9 w-80 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                                    placeholder="Enter label title"
-                                />
-                            </div>
-                            <div className="flex flex-col gap-1.5">
-                                <label htmlFor="color" className="text-sm font-medium">
-                                    Color
-                                </label>
-                                <input
-                                    type="color"
-                                    name="color"
-                                    id="color"
-                                    value={color}
-                                    onChange={(e) => setColor(e.target.value)}
-                                    className="h-10 w-20 rounded-md border border-input bg-transparent p-1 shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                                />
-                            </div>
-                        </div>
-                        {/* footer */}
-                        <div className="px-6 py-4 flex justify-end gap-3 bg-muted/10">
-                            <button 
-                                onClick={toggleModal}
-                                className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
-                            >
-                                Cancel
-                            </button>
-                            <BtnGreen
-                                onClick={handleAdd}
-                                text="Add"
-                                width="w-24"
+                        <DialogTitle>Add label</DialogTitle>
+                        <DialogDescription>
+                            Create a reusable annotation class for this project.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="grid gap-4 py-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="label-title">
+                                Label name
+                                <span className="text-destructive">*</span>
+                            </Label>
+                            <Input
+                                id="label-title"
+                                name="title"
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                placeholder="e.g. Tumor boundary"
                             />
                         </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="label-color">
+                                Color
+                                <span className="text-destructive">*</span>
+                            </Label>
+                            <div className="flex items-center gap-2">
+                                <Input
+                                    id="label-color"
+                                    name="color"
+                                    type="color"
+                                    value={color}
+                                    onChange={(e) => setColor(e.target.value)}
+                                    className="h-9 w-12 shrink-0 cursor-pointer p-1"
+                                    aria-label="Custom label color"
+                                />
+                                <Input
+                                    value={color.toUpperCase()}
+                                    onChange={(e) => setColor(e.target.value)}
+                                    aria-label="Label color hex value"
+                                />
+                                <Palette className="size-4 shrink-0 text-muted-foreground" />
+                            </div>
+                            <div
+                                className="flex flex-wrap gap-2 pt-1"
+                                aria-label="Suggested label colors"
+                            >
+                                {LABEL_COLORS.map((labelColor) => (
+                                    <Button
+                                        key={labelColor}
+                                        type="button"
+                                        variant="outline"
+                                        size="icon-sm"
+                                        className="rounded-full p-0"
+                                        style={{ backgroundColor: labelColor }}
+                                        aria-label={`Use color ${labelColor}`}
+                                        onClick={() => setColor(labelColor)}
+                                    >
+                                        {color.toUpperCase() === labelColor && (
+                                            <Check className="size-3 text-white drop-shadow" />
+                                        )}
+                                    </Button>
+                                ))}
+                            </div>
+                        </div>
                     </div>
-                </div>
-            )}
-        </div>
+
+                    <DialogFooter>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => handleOpenChange(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button type="submit" disabled={isSubmitting}>
+                            {isSubmitting ? 'Adding...' : 'Add label'}
+                        </Button>
+                    </DialogFooter>
+                </form>
+            </DialogContent>
+        </Dialog>
     );
 };
 
