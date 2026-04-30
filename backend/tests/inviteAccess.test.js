@@ -23,6 +23,7 @@ await jest.unstable_mockModule('../models/userModel.js', () => ({
 }));
 await jest.unstable_mockModule('../services/notificationService.js', () => ({
     createNotification: createNotificationMock,
+    createNotifications: jest.fn(),
     deleteNotification: jest.fn(),
     getUnreadCount: jest.fn(),
     listNotifications: jest.fn(),

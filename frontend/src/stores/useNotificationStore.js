@@ -6,9 +6,20 @@ const authConfig = (token) => ({
   headers: { Authorization: `Bearer ${token}` },
 });
 
+const isVisibleNotification = (notification) =>
+  notification.type !== 'invite.created' ||
+  notification.inviteId?.status === 'Pending';
+
+const visibleNotifications = (notifications) =>
+  notifications.filter(isVisibleNotification);
+
 const mergeNotification = (notifications, notification) => {
   if (!notification?._id) {
     return notifications;
+  }
+
+  if (!isVisibleNotification(notification)) {
+    return notifications.filter((item) => item._id !== notification._id);
   }
 
   const exists = notifications.some((item) => item._id === notification._id);
@@ -57,7 +68,7 @@ export const useNotificationStore = create((set, get) => ({
         '/api/notificationRoute',
         authConfig(token),
       );
-      set({ notifications: response.data, error: null });
+      set({ notifications: visibleNotifications(response.data), error: null });
     } catch (requestError) {
       set({ error: requestError });
     } finally {

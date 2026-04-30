@@ -16,6 +16,36 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Bell, Check, Inbox, Trash2, X } from 'lucide-react';
 import { useNotificationStore } from '@/stores/useNotificationStore';
 
+const getDisplayName = (user) =>
+  user?.name || user?.email || 'Someone';
+
+const getBoardName = (board) =>
+  board?.title ? `"${board.title}"` : 'this board';
+
+const getNotificationMessage = (notification) => {
+  const actorName = getDisplayName(notification.fromId);
+  const boardName = getBoardName(notification.boardId);
+
+  switch (notification.type) {
+    case 'invite.created':
+      return `${actorName} invited you to join ${boardName}.`;
+    case 'invite.accepted':
+      return `${actorName} accepted the invite to ${boardName}.`;
+    case 'invite.canceled':
+      return `The invite to ${boardName} was declined.`;
+    case 'board.deleted':
+      return `${actorName} deleted a board you had access to.`;
+    case 'member.added':
+      return `You were added to ${boardName}.`;
+    case 'member.removed':
+      return `${actorName} removed a member from ${boardName}.`;
+    default:
+      return notification.boardId?.title
+        ? `Update for ${notification.boardId.title}.`
+        : 'You have a new notification.';
+  }
+};
+
 const Notification = () => {
   const user = useAuthStore((state) => state.user);
   const [pendingInviteId, setPendingInviteId] = useState(null);
@@ -153,9 +183,7 @@ const Notification = () => {
                   notification.inviteId;
                 const title = notification.title || 'Notification';
                 const boardTitle = notification.boardId?.title;
-                const message =
-                  notification.message ||
-                  (boardTitle ? `Update for ${boardTitle}.` : '');
+                const message = getNotificationMessage(notification);
                 const image = notification.boardId?.image;
 
                 return (

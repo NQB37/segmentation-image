@@ -25,7 +25,7 @@ const login = async ({ email, password }) => {
     }
 
     const token = createToken(user._id);
-    return { email, token };
+    return { _id: user._id, email, token };
 };
 
 const signup = async ({ email, name, password, confirmPassword }) => {
@@ -57,7 +57,7 @@ const signup = async ({ email, name, password, confirmPassword }) => {
     });
 
     const token = createToken(user._id);
-    return { email, name, baseAvatar, token };
+    return { _id: user._id, email, name, baseAvatar, token };
 };
 
 const getUserProfile = (userId) => User.findById(userId);

@@ -8,6 +8,10 @@ const populateNotification = (query) =>
     { path: 'inviteId', select: '_id status' },
   ]);
 
+const isVisibleNotification = (notification) =>
+  notification.type !== 'invite.created' ||
+  notification.inviteId?.status === 'Pending';
+
 const createNotification = async ({
   toId,
   fromId,
@@ -48,13 +52,19 @@ const createNotifications = async (items) => {
   return results;
 };
 
-const listNotifications = (toId) =>
-  populateNotification(
+const listNotifications = async (toId) => {
+  const notifications = await populateNotification(
     Notification.find({ toId }).sort({ createdAt: -1 }).limit(50),
   );
 
-const getUnreadCount = (toId) =>
-  Notification.countDocuments({ toId, readAt: null });
+  return notifications.filter(isVisibleNotification);
+};
+
+const getUnreadCount = async (toId) => {
+  const notifications = await listNotifications(toId);
+
+  return notifications.filter((notification) => !notification.readAt).length;
+};
 
 const markNotificationRead = async (toId, notificationId) => {
   const notification = await populateNotification(
