@@ -18,6 +18,7 @@ const listInvites = (userId) =>
 const createInvite = async ({ toEmail, boardId }, userId) => {
   const emptyFields = [];
 
+  // check empty fields
   if (!toEmail) {
     emptyFields.push('toEmail');
   }
@@ -34,6 +35,7 @@ const createInvite = async ({ toEmail, boardId }, userId) => {
     throw serviceError(400, 'Invalid board ID.');
   }
 
+  // check if board exists and authorized to invite
   const board = await Board.findById(boardId);
   if (!board) {
     throw serviceError(404, 'Board not found.');
@@ -43,6 +45,7 @@ const createInvite = async ({ toEmail, boardId }, userId) => {
     throw serviceError(403, 'Not authorized.');
   }
 
+  // check if user is the owner of the board
   const normalizedEmail = toEmail.trim().toLowerCase();
   const toUser = await User.findOne({ email: normalizedEmail });
   if (!toUser) {
@@ -53,6 +56,7 @@ const createInvite = async ({ toEmail, boardId }, userId) => {
     throw serviceError(400, 'Cannot invite yourself.');
   }
 
+  // check if user is already a member of the board
   const isMember = board.membersId.some((memberId) =>
     memberId.equals(toUser._id),
   );
@@ -60,6 +64,7 @@ const createInvite = async ({ toEmail, boardId }, userId) => {
     throw serviceError(409, 'User is already a board member.');
   }
 
+  // check if user is already invited
   const existing = await Invite.findOne({
     toId: toUser._id,
     boardId,
@@ -71,12 +76,14 @@ const createInvite = async ({ toEmail, boardId }, userId) => {
     });
   }
 
+  // create invite
   const invite = await Invite.create({
     toId: toUser._id,
     boardId,
     status: 'Pending',
   });
 
+  // create notification
   try {
     await createNotification({
       toId: toUser._id,
