@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { useAuthContext } from './useAuthContext';
+import { useAuthStore } from '../stores/useAuthStore';
 import { toast } from 'react-toastify';
 import apiClient from '../api/client';
 
 export const useLogin = () => {
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-    const { dispatch } = useAuthContext();
+    const loginUser = useAuthStore((state) => state.login);
     const login = async (email, password) => {
         setIsLoading(true);
         setError(null);
@@ -20,10 +20,7 @@ export const useLogin = () => {
             );
             const json = res.data;
 
-            // save user
-            localStorage.setItem('user', JSON.stringify(json));
-            // update auth
-            dispatch({ type: 'LOGIN', payload: json });
+            loginUser(json);
             setIsLoading(false);
             toast.success('Login successfully.');
             return { success: true };

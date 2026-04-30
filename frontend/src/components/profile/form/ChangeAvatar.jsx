@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { useAuthContext } from '../../../hooks/useAuthContext';
+import { useAuthStore } from '../../../stores/useAuthStore';
 import apiClient from '../../../api/client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,7 @@ import { Label } from '@/components/ui/label';
 import { Camera, ImagePlus } from 'lucide-react';
 
 const ChangeAvatar = ({ onAvatarChange }) => {
-    const { user } = useAuthContext();
+    const user = useAuthStore((state) => state.user);
     const [image, setImage] = useState('');
     const [isModalOpened, setIsModalOpened] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);

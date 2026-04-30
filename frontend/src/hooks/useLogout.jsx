@@ -1,12 +1,11 @@
-import { useAuthContext } from './useAuthContext';
-import { useBoardContext } from './useBoardContext';
+import { useAuthStore } from '../stores/useAuthStore';
+import { useBoardStore } from '../stores/useBoardStore';
 export const useLogout = () => {
-    const { dispatch } = useAuthContext();
-    const { dispatch: boardsDispatch } = useBoardContext();
+    const logoutUser = useAuthStore((state) => state.logout);
+    const clearBoards = useBoardStore((state) => state.clearBoards);
     const logout = async () => {
-        localStorage.removeItem('user');
-        dispatch({ type: 'LOGOUT' });
-        boardsDispatch({ type: 'SET_BOARDS', payload: null });
+        logoutUser();
+        clearBoards();
     };
     return { logout };
 };

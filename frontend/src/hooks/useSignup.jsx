@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { useAuthContext } from './useAuthContext';
+import { useAuthStore } from '../stores/useAuthStore';
 import { toast } from 'react-toastify';
 import apiClient from '../api/client';
 
 export const useSignUp = () => {
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-    const { dispatch } = useAuthContext();
+    const signupUser = useAuthStore((state) => state.signup);
     const signup = async (email, name, password, confirmPassword) => {
         setIsLoading(true);
         setError(null);
@@ -20,10 +20,7 @@ export const useSignUp = () => {
             );
             const json = res.data;
 
-            // save user
-            localStorage.setItem('user', JSON.stringify(json));
-            // update auth
-            dispatch({ type: 'SIGNUP', payload: json });
+            signupUser(json);
             setIsLoading(false);
             toast.success('Signup successfully.');
             return { success: true };

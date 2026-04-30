@@ -1,8 +1,8 @@
 import AddLabelModal from './form/AddLabelModal';
 import { useCanvasContext } from '../../../hooks/useCanvasContext';
 import { useParams } from 'react-router-dom';
-import { useLabelContext } from '../../../hooks/useLabelContext';
-import { useAuthContext } from '../../../hooks/useAuthContext';
+import { useLabelStore } from '../../../stores/useLabelStore';
+import { useAuthStore } from '../../../stores/useAuthStore';
 import { toast } from 'react-toastify';
 import apiClient from '../../../api/client';
 import { ScrollArea } from '../../ui/scroll-area';
@@ -18,15 +18,15 @@ const LabelContainer = ({ labels }) => {
     } = useCanvasContext();
 
     const { id } = useParams();
-    const { labelsDispatch } = useLabelContext();
-    const { user } = useAuthContext();
+    const deleteLabel = useLabelStore((state) => state.deleteLabel);
+    const user = useAuthStore((state) => state.user);
 
     const handleDeleteLabel = async (labelId) => {
         try {
             const res = await apiClient.delete(`/api/boardRoute/${id}/label/${labelId}`, {
                 headers: { Authorization: `Bearer ${user.token}` },
             });
-            labelsDispatch({ type: 'DELETE_LABEL', payload: res.data });
+            deleteLabel(res.data);
         } catch (error) {
             toast.error(error.response?.data?.error || 'An error occurred.');
         }

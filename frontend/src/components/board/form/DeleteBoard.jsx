@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { useBoardContext } from '../../../hooks/useBoardContext';
-import { useAuthContext } from '../../../hooks/useAuthContext';
+import { useBoardStore } from '../../../stores/useBoardStore';
+import { useAuthStore } from '../../../stores/useAuthStore';
 import apiClient from '../../../api/client';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,8 +16,8 @@ import {
 import { Trash2 } from 'lucide-react';
 
 const DeleteBoard = ({ _id }) => {
-    const { dispatch } = useBoardContext();
-    const { user } = useAuthContext();
+    const deleteBoard = useBoardStore((state) => state.deleteBoard);
+    const user = useAuthStore((state) => state.user);
     const [isModalOpened, setIsModalOpened] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -38,7 +38,7 @@ const DeleteBoard = ({ _id }) => {
                     Authorization: `Bearer ${user.token}`,
                 },
             });
-            dispatch({ type: 'DELETE_BOARD', payload: res.data });
+            deleteBoard(res.data);
             toast.success('Delete project successfully.');
             setIsModalOpened(false);
         } catch (error) {

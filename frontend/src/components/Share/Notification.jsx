@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useAuthContext } from '../../hooks/useAuthContext';
+import { useAuthStore } from '../../stores/useAuthStore';
 import useFetch from '../../hooks/useFetch';
 import Loading from './Loading';
 import { toast } from 'react-toastify';
@@ -17,7 +17,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Bell, Check, Inbox, X } from 'lucide-react';
 
 const Notification = () => {
-    const { user } = useAuthContext();
+    const user = useAuthStore((state) => state.user);
     const [pendingInviteId, setPendingInviteId] = useState(null);
     const [notifications, setNotifications] = useState([]);
 

@@ -2,7 +2,7 @@ import { useCanvasContext } from '../../../hooks/useCanvasContext';
 import { Button } from '../../ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../ui/tooltip';
 import { MousePointer2, Paintbrush, Eraser, PaintBucket, Trash2, Download, Save } from 'lucide-react';
-import { useAuthContext } from '../../../hooks/useAuthContext';
+import { useAuthStore } from '../../../stores/useAuthStore';
 import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom';
 import apiClient from '../../../api/client';
@@ -24,7 +24,7 @@ const ToolboxContainer = () => {
     handleClearCanvas,
   } = useCanvasContext();
 
-  const { user } = useAuthContext();
+  const user = useAuthStore((state) => state.user);
   const { id } = useParams();
 
   const handleSaveAnnotation = async () => {

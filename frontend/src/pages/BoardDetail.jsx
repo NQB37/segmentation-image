@@ -6,17 +6,17 @@ import WorkspaceSidebar from "../components/workplace/WorkspaceSidebar";
 import { useParams } from "react-router-dom";
 import useFetch from "../hooks/useFetch";
 import Loading from "../components/Share/Loading";
-import { useAuthContext } from "../hooks/useAuthContext";
+import { useAuthStore } from "../stores/useAuthStore";
 import { useEffect } from "react";
 import { useCanvasContext } from "../hooks/useCanvasContext";
-import { useLabelContext } from "../hooks/useLabelContext";
-import { useMemberContext } from "../hooks/useMemberContext";
+import { useLabelStore } from "../stores/useLabelStore";
+import { useMemberStore } from "../stores/useMemberStore";
 
 const BoardDetailPage = () => {
   const { id } = useParams();
-  const { user } = useAuthContext();
-  const { labelsDispatch } = useLabelContext();
-  const { membersDispatch } = useMemberContext();
+  const user = useAuthStore((state) => state.user);
+  const setLabels = useLabelStore((state) => state.setLabels);
+  const setMembers = useMemberStore((state) => state.setMembers);
   const { handleLoadImage } = useCanvasContext();
 
   const { data, isLoading } = useFetch(`/api/boardRoute/${id}`, {
@@ -27,10 +27,10 @@ const BoardDetailPage = () => {
     if (data) {
       handleLoadImage("background", data.image);
       handleLoadImage("annotation", data.annotationImage);
-      labelsDispatch({ type: "SET_LABELS", payload: data.labelsId });
-      membersDispatch({ type: "SET_MEMBERS", payload: data.membersId });
+      setLabels(data.labelsId);
+      setMembers(data.membersId);
     }
-  }, [data]);
+  }, [data, handleLoadImage, setLabels, setMembers]);
 
   if (isLoading) return <Loading />;
 

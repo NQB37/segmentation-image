@@ -1,14 +1,14 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import LabelContainer from "./label/LabelContainer";
 import MemberContainer from "./member/MemberContainer";
-import { useLabelContext } from "../../hooks/useLabelContext";
-import { useMemberContext } from "../../hooks/useMemberContext";
-import { useAuthContext } from "../../hooks/useAuthContext";
+import { useLabelStore } from "../../stores/useLabelStore";
+import { useMemberStore } from "../../stores/useMemberStore";
+import { useAuthStore } from "../../stores/useAuthStore";
 
 const WorkspaceSidebar = () => {
-  const { labels } = useLabelContext();
-  const { members } = useMemberContext();
-  const { user } = useAuthContext();
+  const labels = useLabelStore((state) => state.labels);
+  const members = useMemberStore((state) => state.members);
+  const user = useAuthStore((state) => state.user);
 
   return (
     <div className="w-72 border-l bg-background flex flex-col">

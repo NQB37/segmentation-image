@@ -3,56 +3,35 @@ import {
     createBrowserRouter,
     RouterProvider,
 } from 'react-router-dom';
-import { useAuthContext } from './hooks/useAuthContext';
+import { useAuthStore } from './stores/useAuthStore';
 import { CanvasProvider } from './hooks/useCanvasContext';
 import LoginPage from './pages/Login';
 import SignupPage from './pages/Signup';
 import BoardPage from './pages/Board';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { BoardContextProvider } from './context/BoardContext';
 import ErrorPage from './pages/Error';
 import ProfilePage from './pages/Profile';
 import BoardDetailPage from './pages/BoardDetail';
-import { LabelContextProvider } from './context/LabelContext';
-import { MemberContextProvider } from './context/MemberContext';
 function App() {
-    const { user } = useAuthContext();
+    const user = useAuthStore((state) => state.user);
     const router = createBrowserRouter([
         {
             path: '/',
-            element: user ? (
-                <BoardContextProvider>
-                    <BoardPage />
-                </BoardContextProvider>
-            ) : (
-                <Navigate to="/login" />
-            ),
+            element: user ? <BoardPage /> : <Navigate to="/login" />,
             errorElement: <ErrorPage />,
         },
         {
             path: '/board',
-            element: user ? (
-                <BoardContextProvider>
-                    <BoardPage />
-                </BoardContextProvider>
-            ) : (
-                <Navigate to="/login" />
-            ),
+            element: user ? <BoardPage /> : <Navigate to="/login" />,
             errorElement: <ErrorPage />,
         },
         {
             path: '/board/:id',
             element: user ? (
-                <BoardContextProvider>
-                    <LabelContextProvider>
-                        <MemberContextProvider>
-                            <CanvasProvider>
-                                <BoardDetailPage />
-                            </CanvasProvider>
-                        </MemberContextProvider>
-                    </LabelContextProvider>
-                </BoardContextProvider>
+                <CanvasProvider>
+                    <BoardDetailPage />
+                </CanvasProvider>
             ) : (
                 <Navigate to="/login" />
             ),
@@ -70,13 +49,7 @@ function App() {
         },
         {
             path: '/profile',
-            element: user ? (
-                <BoardContextProvider>
-                    <ProfilePage />
-                </BoardContextProvider>
-            ) : (
-                <Navigate to="/login" />
-            ),
+            element: user ? <ProfilePage /> : <Navigate to="/login" />,
             errorElement: <ErrorPage />,
         },
         {

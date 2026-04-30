@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { useAuthContext } from '../../../../hooks/useAuthContext';
+import { useAuthStore } from '../../../../stores/useAuthStore';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import BtnGreen from '../../../Share/BtnGreen';
-import { useLabelContext } from '../../../../hooks/useLabelContext';
+import { useLabelStore } from '../../../../stores/useLabelStore';
 import apiClient from '../../../../api/client';
 import { Plus, X } from 'lucide-react';
 
@@ -22,8 +22,8 @@ const AddLabelModal = () => {
 
     // board id
     const { id } = useParams();
-    const { labelsDispatch } = useLabelContext();
-    const { user } = useAuthContext();
+    const createLabel = useLabelStore((state) => state.createLabel);
+    const user = useAuthStore((state) => state.user);
 
     const handleAdd = async () => {
         if (!title) {
@@ -45,7 +45,7 @@ const AddLabelModal = () => {
                     },
                 },
             );
-            labelsDispatch({ type: 'CREATE_LABEL', payload: res.data });
+            createLabel(res.data);
         } catch (error) {
             toast.error(
                 error.response?.data?.error || 'An error occurred (FE).',

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { useBoardContext } from '../../../hooks/useBoardContext';
-import { useAuthContext } from '../../../hooks/useAuthContext';
+import { useBoardStore } from '../../../stores/useBoardStore';
+import { useAuthStore } from '../../../stores/useAuthStore';
 import apiClient from '../../../api/client';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,8 +18,8 @@ import { Label } from '@/components/ui/label';
 import { ImagePlus, Plus } from 'lucide-react';
 
 const NewBoard = () => {
-    const { dispatch } = useBoardContext();
-    const { user } = useAuthContext();
+    const createBoard = useBoardStore((state) => state.createBoard);
+    const user = useAuthStore((state) => state.user);
     const [isModalOpened, setIsModalOpened] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [title, setTitle] = useState('');
@@ -88,7 +88,7 @@ const NewBoard = () => {
                 },
             );
 
-            dispatch({ type: 'CREATE_BOARD', payload: res.data });
+            createBoard(res.data);
             toast.success('Create new project successfully.');
             handleOpenChange(false);
         } catch (error) {

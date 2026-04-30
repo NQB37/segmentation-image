@@ -3,8 +3,8 @@ import BtnRed from "../../../Share/BtnRed";
 import BtnGray from "../../../Share/BtnGray";
 import { toast } from "react-toastify";
 import apiClient from "../../../../api/client";
-import { useAuthContext } from "../../../../hooks/useAuthContext";
-import { useMemberContext } from "../../../../hooks/useMemberContext";
+import { useAuthStore } from "../../../../stores/useAuthStore";
+import { useMemberStore } from "../../../../stores/useMemberStore";
 import { useParams } from "react-router-dom";
 import { Trash2, X } from "lucide-react";
 
@@ -17,8 +17,8 @@ const DeleteMemberModal = ({ _id }) => {
 
   // board id
   const { id } = useParams();
-  const { membersDispatch } = useMemberContext();
-  const { user } = useAuthContext();
+  const deleteMember = useMemberStore((state) => state.deleteMember);
+  const user = useAuthStore((state) => state.user);
   const handleDeleteMember = async (_id) => {
     toggleModal();
     try {
@@ -31,7 +31,7 @@ const DeleteMemberModal = ({ _id }) => {
           },
         }
       );
-      membersDispatch({ type: "DELETE_MEMBER", payload: res.data });
+      deleteMember(res.data);
     } catch (error) {
       toast.error(error.response?.data?.error || "An error occurred (FE).");
     }

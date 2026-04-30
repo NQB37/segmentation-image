@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLogout } from '../../hooks/useLogout';
 import { Link } from 'react-router-dom';
-import { useAuthContext } from '../../hooks/useAuthContext';
+import { useAuthStore } from '../../stores/useAuthStore';
 import { toast } from 'react-toastify';
 import apiClient from '../../api/client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -27,7 +27,7 @@ const getInitials = (name, email) => {
 };
 
 const DropdownProfile = () => {
-    const { user } = useAuthContext();
+    const user = useAuthStore((state) => state.user);
     const { logout } = useLogout();
     const [profile, setProfile] = useState({
         avatar: '',

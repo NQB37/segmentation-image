@@ -1,8 +1,8 @@
 import BoardCard from '../components/board/BoardCard';
 import NewBoard from '../components/board/form/NewBoard';
 import { useEffect } from 'react';
-import { useBoardContext } from '../hooks/useBoardContext';
-import { useAuthContext } from '../hooks/useAuthContext';
+import { useBoardStore } from '../stores/useBoardStore';
+import { useAuthStore } from '../stores/useAuthStore';
 import Header from '../components/Share/Header';
 import useFetch from '../hooks/useFetch';
 import Loading from '../components/Share/Loading';
@@ -17,17 +17,18 @@ import {
 import { AlertTriangle, Images } from 'lucide-react';
 
 const BoardPage = () => {
-  const { boards, dispatch } = useBoardContext();
-  const { user } = useAuthContext();
+  const boards = useBoardStore((state) => state.boards);
+  const setBoards = useBoardStore((state) => state.setBoards);
+  const user = useAuthStore((state) => state.user);
   const { data, isLoading, error } = useFetch('/api/boardRoute', {
     headers: { Authorization: `Bearer ${user?.token}` },
   });
 
   useEffect(() => {
     if (data) {
-      dispatch({ type: 'SET_BOARDS', payload: data });
+      setBoards(data);
     }
-  }, [data, dispatch]);
+  }, [data, setBoards]);
 
   return (
     <div className='min-h-screen bg-background text-foreground'>

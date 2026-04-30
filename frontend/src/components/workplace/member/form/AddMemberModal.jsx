@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useAuthContext } from '../../../../hooks/useAuthContext';
+import { useAuthStore } from '../../../../stores/useAuthStore';
 import BtnGreen from '../../../Share/BtnGreen';
 import apiClient from '../../../../api/client';
 
@@ -19,7 +19,7 @@ const AddMemberModal = () => {
 
     // get board id
     const { id } = useParams();
-    const { user } = useAuthContext();
+    const user = useAuthStore((state) => state.user);
 
     const handleInvite = async () => {
         if (!email) {

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { useAuthContext } from '../../../hooks/useAuthContext';
+import { useAuthStore } from '../../../stores/useAuthStore';
 import apiClient from '../../../api/client';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,7 +17,7 @@ import { Label } from '@/components/ui/label';
 import { KeyRound } from 'lucide-react';
 
 const ChangePassword = () => {
-    const { user } = useAuthContext();
+    const user = useAuthStore((state) => state.user);
     const [isModalOpened, setIsModalOpened] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [currentPassword, setCurrentPassword] = useState('');
