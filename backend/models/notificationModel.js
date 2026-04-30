@@ -7,6 +7,8 @@ const notificationTypes = [
   'invite.accepted',
   'invite.canceled',
   'board.deleted',
+  'member.added',
+  'member.removed',
 ];
 
 const notificationSchema = new Schema(
@@ -29,11 +31,6 @@ const notificationSchema = new Schema(
       index: true,
     },
     title: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    message: {
       type: String,
       required: true,
       trim: true,

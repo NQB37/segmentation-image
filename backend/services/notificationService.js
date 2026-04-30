@@ -13,7 +13,6 @@ const createNotification = async ({
   fromId,
   type,
   title,
-  message,
   boardId,
   inviteId,
 }) => {
@@ -22,7 +21,6 @@ const createNotification = async ({
     fromId,
     type,
     title,
-    message,
     boardId,
     inviteId,
   });

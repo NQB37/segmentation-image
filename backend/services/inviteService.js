@@ -90,7 +90,6 @@ const createInvite = async ({ toEmail, boardId }, userId) => {
       fromId: userId,
       type: 'invite.created',
       title: 'Project invite',
-      message: `You were invited to join ${board.title}.`,
       boardId: board._id,
       inviteId: invite._id,
     });
@@ -111,6 +110,7 @@ const updateInviteStatus = async (inviteId, status, userId) => {
     throw serviceError(400, 'Invalid invite status.');
   }
 
+  // Get the invite
   const invite = await Invite.findOne({
     _id: inviteId,
     toId: userId,
@@ -122,13 +122,15 @@ const updateInviteStatus = async (inviteId, status, userId) => {
 
   const nextStatus = normalizedStatus === 'accept' ? 'Accepted' : 'Canceled';
 
+  // Get board
+  const board = await Board.findById(invite.boardId);
   if (normalizedStatus === 'accept') {
-    const board = await Board.findById(invite.boardId);
     if (!board) {
       throw serviceError(404, 'Board not found.');
     }
   }
 
+  // Update invite status
   const updatedInvite = await Invite.findOneAndUpdate(
     {
       _id: invite._id,
@@ -142,9 +144,29 @@ const updateInviteStatus = async (inviteId, status, userId) => {
     throw serviceError(404, 'Invite not found.');
   }
 
+  // Add user to board if accepted
   if (normalizedStatus === 'accept') {
     await Board.findByIdAndUpdate(invite.boardId, {
       $addToSet: { membersId: userId },
+    });
+
+    // create notification
+    await createNotification({
+      toId: invite.toId,
+      fromId: userId,
+      type: 'member.added',
+      title: 'Added to board',
+      boardId: board._id,
+    });
+  }
+
+  if (normalizedStatus === 'cancel') {
+    await createNotification({
+      toId: invite.toId,
+      fromId: userId,
+      type: 'invite.canceled',
+      title: 'Invite canceled',
+      boardId: board._id,
     });
   }
 
