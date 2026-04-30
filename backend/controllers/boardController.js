@@ -4,6 +4,7 @@ import {
     deleteBoardForUser,
     deleteBoardLabel,
     deleteBoardMember,
+    leaveBoardForUser,
     getBoardDetails,
     listBoards,
     updateBoardForUser,
@@ -106,6 +107,15 @@ const deleteMember = async (req, res) => {
     }
 };
 
+const leaveBoard = async (req, res) => {
+    try {
+        const board = await leaveBoardForUser(req.params.id, req.user._id);
+        return res.status(200).json(board);
+    } catch (error) {
+        return sendError(res, error, 500);
+    }
+};
+
 export {
     getBoards,
     getBoardById,
@@ -115,4 +125,5 @@ export {
     newLabel,
     deleteLabel,
     deleteMember,
+    leaveBoard,
 };

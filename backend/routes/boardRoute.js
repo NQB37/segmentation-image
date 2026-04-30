@@ -9,6 +9,7 @@ import {
     newLabel,
     deleteLabel,
     deleteMember,
+    leaveBoard,
 } from '../controllers/boardController.js';
 
 const router = express.Router();
@@ -30,6 +31,9 @@ router.patch("/:id", updateBoard);
 
 // DELETE a new board
 router.delete("/:id", deleteBoard);
+
+// Leave a board as a member
+router.delete("/:id/leave", leaveBoard);
 
 // POST a new label
 router.post("/:id/label", newLabel);

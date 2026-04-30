@@ -1,7 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import DeleteBoard from './form/DeleteBoard';
+import LeaveBoard from './form/LeaveBoard';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { isBoardOwner } from '@/lib/boardPermissions';
 import {
     Card,
     CardAction,
@@ -16,8 +18,7 @@ import { ArrowRight, Crown, UserCheck, Users } from 'lucide-react';
 const BoardCard = ({ board, user }) => {
     const navigate = useNavigate();
     const memberCount = board.membersId?.length || 0;
-    const isOwner =
-        user?._id && board.ownerId && String(board.ownerId) === String(user._id);
+    const isOwner = isBoardOwner(board, user);
     const roleBadge = isOwner
         ? {
               label: 'Owner',
@@ -85,7 +86,11 @@ const BoardCard = ({ board, user }) => {
                     onClick={(e) => e.stopPropagation()}
                     onKeyDown={(e) => e.stopPropagation()}
                 >
-                    <DeleteBoard _id={board._id} />
+                    {isOwner ? (
+                        <DeleteBoard _id={board._id} />
+                    ) : (
+                        <LeaveBoard _id={board._id} />
+                    )}
                 </CardAction>
             </CardHeader>
 

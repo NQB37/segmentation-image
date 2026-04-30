@@ -10,6 +10,8 @@ import {
 
 process.env.SECRET = 'test-secret';
 
+const createNotificationsMock = jest.fn();
+
 await jest.unstable_mockModule('../models/boardModel.js', () => ({
     default: boardModel,
 }));
@@ -18,6 +20,15 @@ await jest.unstable_mockModule('../models/labelModel.js', () => ({
 }));
 await jest.unstable_mockModule('../models/userModel.js', () => ({
     default: userModel,
+}));
+await jest.unstable_mockModule('../services/notificationService.js', () => ({
+    createNotification: jest.fn(),
+    createNotifications: createNotificationsMock,
+    deleteNotification: jest.fn(),
+    getUnreadCount: jest.fn(),
+    listNotifications: jest.fn(),
+    markAllNotificationsRead: jest.fn(),
+    markNotificationRead: jest.fn(),
 }));
 
 const { default: app } = await import('../app.js');
@@ -48,6 +59,8 @@ const createBoard = (attrs = {}) =>
 
 beforeEach(() => {
     resetStore();
+    createNotificationsMock.mockReset();
+    createNotificationsMock.mockResolvedValue([]);
 });
 
 describe('board authorization', () => {
@@ -148,5 +161,41 @@ describe('board authorization', () => {
         expect(untouchedBoard.labelsId.map(String)).toContain(
             label._id.toString(),
         );
+    });
+
+    test('member can leave a board', async () => {
+        const owner = await createUser('owner@example.com');
+        const member = await createUser('member@example.com');
+        const board = await createBoard({
+            ownerId: owner._id,
+            membersId: [member._id],
+        });
+
+        const response = await request(app)
+            .delete(`/api/boardRoute/${board._id}/leave`)
+            .set('Authorization', `Bearer ${tokenFor(member)}`);
+
+        expect(response.status).toBe(200);
+        expect(response.body._id).toBe(board._id.toString());
+
+        const updatedBoard = await Board.findById(board._id);
+        expect(updatedBoard.membersId.map(String)).not.toContain(
+            member._id.toString(),
+        );
+        expect(updatedBoard.ownerId.toString()).toBe(owner._id.toString());
+    });
+
+    test('owner cannot leave their own board through member leave route', async () => {
+        const owner = await createUser('owner@example.com');
+        const board = await createBoard({ ownerId: owner._id });
+
+        const response = await request(app)
+            .delete(`/api/boardRoute/${board._id}/leave`)
+            .set('Authorization', `Bearer ${tokenFor(owner)}`);
+
+        expect(response.status).toBe(400);
+
+        const unchangedBoard = await Board.findById(board._id);
+        expect(unchangedBoard.ownerId.toString()).toBe(owner._id.toString());
     });
 });

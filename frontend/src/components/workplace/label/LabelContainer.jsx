@@ -5,7 +5,7 @@ import { ScrollArea } from '../../ui/scroll-area';
 import { Button } from '../../ui/button';
 import { Eye, EyeOff } from 'lucide-react';
 
-const LabelContainer = ({ labels }) => {
+const LabelContainer = ({ labels, isOwner }) => {
     const {
         color,
         handleColorChange,
@@ -21,7 +21,7 @@ const LabelContainer = ({ labels }) => {
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleAnnotationToggle} title={annotationToggle ? "Hide Annotations" : "Show Annotations"}>
                         {annotationToggle ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                     </Button>
-                    <AddLabelModal />
+                    {isOwner && <AddLabelModal />}
                 </div>
             </div>
 
@@ -57,7 +57,7 @@ const LabelContainer = ({ labels }) => {
                                 {color === label.color && (
                                     <span className="text-[10px] font-bold uppercase text-primary px-1.5 py-0.5 bg-primary/10 rounded mr-1">Active</span>
                                 )}
-                                <DeleteLabelModal label={label} />
+                                {isOwner && <DeleteLabelModal label={label} />}
                             </div>
                         </div>
                     ))}

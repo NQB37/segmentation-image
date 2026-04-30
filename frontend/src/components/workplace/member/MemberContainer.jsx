@@ -3,12 +3,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar";
 import AddMemberModal from "./form/AddMemberModal";
 import DeleteMemberModal from "./form/DeleteMemberModal";
 
-const MemberContainer = ({ members }) => {
+const MemberContainer = ({ members, isOwner }) => {
   return (
     <div className="flex flex-col h-full">
       <div className="p-3 flex justify-between items-center border-b bg-muted/30">
         <span className="text-xs font-semibold uppercase text-muted-foreground tracking-wider">Collaborators</span>
-        <AddMemberModal />
+        {isOwner && <AddMemberModal />}
       </div>
 
       <ScrollArea className="flex-grow">
@@ -22,7 +22,7 @@ const MemberContainer = ({ members }) => {
                 </Avatar>
                 <div className="text-sm font-medium">{member.name}</div>
               </div>
-              <DeleteMemberModal member={member} />
+              {isOwner && <DeleteMemberModal member={member} />}
             </div>
           ))}
         </div>

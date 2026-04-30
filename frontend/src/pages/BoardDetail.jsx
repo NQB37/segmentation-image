@@ -11,6 +11,7 @@ import { useEffect } from "react";
 import { useCanvasContext } from "../hooks/useCanvasContext";
 import { useLabelStore } from "../stores/useLabelStore";
 import { useMemberStore } from "../stores/useMemberStore";
+import { isBoardOwner } from "../lib/boardPermissions";
 
 const BoardDetailPage = () => {
   const { id } = useParams();
@@ -34,6 +35,8 @@ const BoardDetailPage = () => {
 
   if (isLoading) return <Loading />;
 
+  const isOwner = isBoardOwner(data, user);
+
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-background">
       <Header />
@@ -44,7 +47,7 @@ const BoardDetailPage = () => {
         <main className="flex-grow relative bg-slate-50 overflow-hidden">
           <CanvasContainer />
         </main>
-        <WorkspaceSidebar />
+        <WorkspaceSidebar isOwner={isOwner} />
       </div>
     </div>
   );

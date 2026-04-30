@@ -279,12 +279,46 @@ const deleteBoardMember = async (boardId, memberId, userId) => {
   return member;
 };
 
+const leaveBoardForUser = async (boardId, userId) => {
+  assertValidObjectId(boardId, 'Board not exists.');
+
+  const board = await Board.findById(boardId);
+  if (!board) {
+    throw serviceError(404, 'Board not exists.');
+  }
+  if (isSameId(board.ownerId, userId)) {
+    throw serviceError(400, 'Board owner cannot leave their own board.');
+  }
+  if (!boardHasMember(board, userId)) {
+    throw serviceError(403, 'Request not authorized.');
+  }
+
+  const updatedBoard = await Board.findOneAndUpdate(
+    { _id: boardId, membersId: userId },
+    { $pull: { membersId: userId } },
+    { new: true },
+  );
+  if (!updatedBoard) {
+    throw serviceError(403, 'Request not authorized.');
+  }
+
+  await notifyBoardParticipants({
+    board,
+    fromId: userId,
+    type: 'member.removed',
+    title: 'Member left board',
+  });
+
+  return updatedBoard;
+};
+
 export {
   createBoardForUser,
   createBoardLabel,
   deleteBoardForUser,
   deleteBoardLabel,
   deleteBoardMember,
+  leaveBoardForUser,
   getBoardDetails,
   listBoards,
   updateBoardForUser,
