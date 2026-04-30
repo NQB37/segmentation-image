@@ -22,7 +22,7 @@ const MemberContainer = ({ members }) => {
                 </Avatar>
                 <div className="text-sm font-medium">{member.name}</div>
               </div>
-              <DeleteMemberModal _id={member._id} />
+              <DeleteMemberModal member={member} />
             </div>
           ))}
         </div>
