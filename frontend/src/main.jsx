@@ -6,9 +6,9 @@ import App from './App.jsx';
 import { TooltipProvider } from './components/ui/tooltip';
 
 createRoot(document.getElementById('root')).render(
-    <StrictMode>
-        <TooltipProvider>
-            <App />
-        </TooltipProvider>
-    </StrictMode>,
+  <StrictMode>
+    <TooltipProvider>
+      <App />
+    </TooltipProvider>
+  </StrictMode>,
 );
