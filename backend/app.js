@@ -4,10 +4,11 @@ import notificationRoute from './routes/notificationRoute.js';
 import boardsRoute from './routes/boardRoute.js';
 import userRoute from './routes/userRoute.js';
 import inviteRoute from './routes/inviteRoute.js';
+import corsOptions from './config/cors.js';
 
 const app = express();
 
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json({ limit: '20mb' }));
 
 app.use((req, res, next) => {

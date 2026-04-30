@@ -7,6 +7,7 @@ import { Server } from 'socket.io';
 import jwt from 'jsonwebtoken';
 import User from './models/userModel.js';
 import { setSocketServer, userRoom } from './utils/socket.js';
+import corsOptions from './config/cors.js';
 
 dns.setServers(['8.8.8.8', '1.1.1.1']);
 
@@ -16,10 +17,7 @@ const MONGO_URI = env.MONGO_URI;
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  cors: {
-    origin: '*',
-    methods: ['GET', 'POST', 'PATCH', 'DELETE'],
-  },
+  cors: corsOptions,
 });
 
 io.use(async (socket, next) => {
