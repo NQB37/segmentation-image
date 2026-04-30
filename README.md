@@ -2,6 +2,8 @@
 
 Segmentation Image is a full-stack web application for creating image annotation projects, managing labels and collaborators, and saving canvas-based segmentation work. The app combines a React/Vite frontend with an Express/MongoDB backend and real-time notifications over Socket.IO.
 
+**Live Demo:** [cellseg.nqb37.com](https://cellseg.nqb37.com)
+
 ## Features
 
 - User signup, login, profile updates, avatar changes, and password changes.
