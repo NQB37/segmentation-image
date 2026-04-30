@@ -3,7 +3,7 @@ import { emitToUser } from '../utils/socket.js';
 
 const populateNotification = (query) =>
   query.populate([
-    { path: 'actorId', select: '_id email name avatar' },
+    { path: 'fromId', select: '_id email name avatar' },
     { path: 'boardId', select: '_id title image' },
     { path: 'inviteId', select: '_id status' },
   ]);
