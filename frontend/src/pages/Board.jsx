@@ -65,7 +65,7 @@ const BoardPage = () => {
           ) : boards.length ? (
             <div className='grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3'>
               {boards.map((board) => {
-                return <BoardCard board={board} key={board._id} />;
+                return <BoardCard board={board} user={user} key={board._id} />;
               })}
             </div>
           ) : (

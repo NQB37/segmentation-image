@@ -11,11 +11,24 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { ArrowRight, Users } from 'lucide-react';
+import { ArrowRight, Crown, UserCheck, Users } from 'lucide-react';
 
-const BoardCard = ({ board }) => {
+const BoardCard = ({ board, user }) => {
     const navigate = useNavigate();
     const memberCount = board.membersId?.length || 0;
+    const isOwner =
+        user?._id && board.ownerId && String(board.ownerId) === String(user._id);
+    const roleBadge = isOwner
+        ? {
+              label: 'Owner',
+              Icon: Crown,
+              className: 'bg-primary/90 text-primary-foreground shadow-sm',
+          }
+        : {
+              label: 'Member',
+              Icon: UserCheck,
+              className: 'bg-background/90 text-foreground shadow-sm',
+          };
     const updatedAt = board.updatedAt
         ? new Date(board.updatedAt).toLocaleDateString(undefined, {
               month: 'short',
@@ -54,9 +67,18 @@ const BoardCard = ({ board }) => {
                     <Users className="size-3" />
                     {memberCount} {memberCount === 1 ? 'member' : 'members'}
                 </Badge>
+                {user?._id && (
+                    <Badge
+                        variant={isOwner ? 'default' : 'secondary'}
+                        className={`absolute right-3 top-3 gap-1 ${roleBadge.className}`}
+                    >
+                        <roleBadge.Icon className="size-3" />
+                        {roleBadge.label}
+                    </Badge>
+                )}
             </div>
 
-            <CardHeader className="pt-4">
+            <CardHeader className="p-4">
                 <CardTitle className="truncate">{board.title}</CardTitle>
                 <CardDescription>Updated {updatedAt}</CardDescription>
                 <CardAction
