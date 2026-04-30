@@ -1,200 +1,59 @@
-import mongoose from 'mongoose';
-import User from '../models/userModel.js';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
-import validator from 'validator';
+import {
+    getUserProfile,
+    login,
+    signup,
+    updateAvatar,
+    updateInfo,
+    updatePassword,
+} from '../services/userService.js';
 
-// create token base on user id and expire in 30 days
-const createToken = (_id) => {
-    return jwt.sign({ _id: _id }, process.env.SECRET, { expiresIn: '30d' });
-};
-
-// login user
 const loginUser = async (req, res) => {
-    const { email, password } = req.body;
     try {
-        // check empty
-        if (!email || !password) {
-            throw Error('Please fill in all the required fields.');
-        }
-        // find user by email
-        const user = await User.findOne({ email });
-        if (!user) {
-            throw Error('Wrong email or password.');
-        }
-        // compare plain password with hash password
-        const match = await bcrypt.compare(password, user.password);
-        if (!match) {
-            throw Error('Wrong email or password.');
-        }
-        // create token
-        const token = createToken(user._id);
-        res.status(200).json({ email, token });
+        const result = await login(req.body);
+        return res.status(200).json(result);
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        return res.status(400).json({ error: error.message });
     }
 };
 
-// signup user
 const signupUser = async (req, res) => {
-    const { email, name, password, confirmPassword } = req.body;
-    const baseAvatar =
-        'https://cdn.iconscout.com/icon/free/png-256/free-user-icon-download-in-svg-png-gif-file-formats--avatar-person-profile-ui-basic-pack-interface-icons-2082543.png';
-
     try {
-        if (!email || !name || !password || !confirmPassword) {
-            throw Error('Please fill in all the required fields.');
-        }
-        // check email
-        if (!validator.isEmail(email)) {
-            throw Error('Email is not valid.');
-        }
-        // check password
-        if (!validator.isStrongPassword(password)) {
-            throw Error('Password is not strong enough.');
-        }
-        // check match password
-        if (password != confirmPassword) {
-            throw Error('Password is not match.');
-        }
-
-        // find user by email
-        const exists = await User.findOne({ email });
-        if (exists) {
-            throw Error('Email already exists.');
-        }
-
-        // gen salt
-        const salt = await bcrypt.genSalt(10);
-        // hash password
-        const hash = await bcrypt.hash(password, salt);
-        // create new user
-        const user = await User.create({
-            email,
-            name,
-            password: hash,
-            avatar: baseAvatar,
-        });
-        // create token
-        const token = createToken(user._id);
-        res.status(200).json({ email, name, baseAvatar, token });
+        const result = await signup(req.body);
+        return res.status(200).json(result);
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        return res.status(400).json({ error: error.message });
     }
 };
 
-// get User by Id
 const getUserById = async (req, res) => {
-    const userId = req.user._id;
-    const user = await User.findById(userId);
-    res.status(200).json(user);
+    const user = await getUserProfile(req.user._id);
+    return res.status(200).json(user);
 };
 
-// change avatar
 const changeAvatar = async (req, res) => {
     try {
-        const { image } = req.body;
-        if (!image) {
-            throw Error('Image is required.');
-        }
-
-        // check user valid
-        const user = await User.findById(req.user?._id);
-        if (!user) {
-            throw Error('User not found.');
-        }
-
-        // update avatar
-        const newInfo = await User.findByIdAndUpdate(
-            req.user?._id,
-            {
-                avatar: image,
-            },
-            { new: true },
-        );
-
-        res.status(200).json({
-            message: 'Profile image updated successfully.',
-        });
+        const result = await updateAvatar(req.user?._id, req.body.image);
+        return res.status(200).json(result);
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        return res.status(400).json({ error: error.message });
     }
 };
 
-// change password
 const changePassword = async (req, res) => {
-    const { currentPassword, newPassword, confirmPassword } = req.body;
     try {
-        if (!currentPassword || !newPassword || !confirmPassword) {
-            throw Error('Please fill in all the required fields.');
-        }
-
-        // check user valid
-        const user = await User.findById(req.user?._id);
-        if (!user) {
-            throw Error('User not found.');
-        }
-
-        // validate
-        // compare current password with db password
-        const validPassword = await bcrypt.compare(
-            currentPassword,
-            user.password,
-        );
-        if (!validPassword) {
-            throw Error('User not found.');
-        }
-        // check password match
-        if (newPassword !== confirmPassword) {
-            throw Error('Password is not match.');
-        }
-        // check strong password
-        if (!validator.isStrongPassword(newPassword)) {
-            throw Error('Password not strong enough.');
-        }
-        // hash new pass
-        const salt = await bcrypt.genSalt(10);
-        const hash = await bcrypt.hash(newPassword, salt);
-
-        // update password
-        const newInfo = await User.findByIdAndUpdate(
-            req.user?._id,
-            {
-                password: hash,
-            },
-            { new: true },
-        );
-        res.status(200).json({ message: 'Change password success.' });
+        const result = await updatePassword(req.user?._id, req.body);
+        return res.status(200).json(result);
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        return res.status(400).json({ error: error.message });
     }
 };
 
-// change information
 const changeInfo = async (req, res) => {
-    const { name } = req.body;
     try {
-        if (!name) {
-            throw Error('Please fill in all the required fields.');
-        }
-
-        // check user valid
-        const user = await User.findById(req.user?._id);
-        if (!user) {
-            throw Error('User not found.');
-        }
-
-        // update password
-        const newInfo = await User.findByIdAndUpdate(
-            req.user?._id,
-            {
-                name: name,
-            },
-            { new: true },
-        );
-        res.status(200).json({ message: 'Change infomation successfully.' });
+        const result = await updateInfo(req.user?._id, req.body);
+        return res.status(200).json(result);
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        return res.status(400).json({ error: error.message });
     }
 };
 
