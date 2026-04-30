@@ -10,6 +10,8 @@ import {
 
 process.env.SECRET = 'test-secret';
 
+const createNotificationMock = jest.fn();
+
 await jest.unstable_mockModule('../models/boardModel.js', () => ({
     default: boardModel,
 }));
@@ -18,6 +20,14 @@ await jest.unstable_mockModule('../models/inviteModel.js', () => ({
 }));
 await jest.unstable_mockModule('../models/userModel.js', () => ({
     default: userModel,
+}));
+await jest.unstable_mockModule('../services/notificationService.js', () => ({
+    createNotification: createNotificationMock,
+    deleteNotification: jest.fn(),
+    getUnreadCount: jest.fn(),
+    listNotifications: jest.fn(),
+    markAllNotificationsRead: jest.fn(),
+    markNotificationRead: jest.fn(),
 }));
 
 const { default: app } = await import('../app.js');
@@ -48,6 +58,8 @@ const createBoard = (attrs = {}) =>
 
 beforeEach(() => {
     resetStore();
+    createNotificationMock.mockReset();
+    createNotificationMock.mockResolvedValue(null);
 });
 
 describe('invite authorization', () => {
@@ -92,5 +104,55 @@ describe('invite authorization', () => {
 
         const unchangedBoard = await Board.findById(board._id);
         expect(unchangedBoard.membersId).toHaveLength(0);
+    });
+
+    test('created invite notification references the saved invite', async () => {
+        const owner = await createUser('owner@example.com');
+        const recipient = await createUser('recipient@example.com');
+        const board = await createBoard({ ownerId: owner._id });
+
+        const response = await request(app)
+            .post('/api/inviteRoute/invite')
+            .set('Authorization', `Bearer ${tokenFor(owner)}`)
+            .send({ toEmail: recipient.email, boardId: board._id });
+
+        expect(response.status).toBe(200);
+        expect(createNotificationMock).toHaveBeenCalledWith(
+            expect.objectContaining({
+                inviteId: expect.anything(),
+            }),
+        );
+
+        const [{ inviteId }] = createNotificationMock.mock.calls[0];
+        expect(String(inviteId)).toBe(response.body._id);
+    });
+
+    test('invite creation succeeds when notification creation fails', async () => {
+        const owner = await createUser('owner@example.com');
+        const recipient = await createUser('recipient@example.com');
+        const board = await createBoard({ ownerId: owner._id });
+        const consoleErrorSpy = jest
+            .spyOn(console, 'error')
+            .mockImplementation(() => {});
+        createNotificationMock.mockRejectedValue(new Error('notification failed'));
+
+        try {
+            const response = await request(app)
+                .post('/api/inviteRoute/invite')
+                .set('Authorization', `Bearer ${tokenFor(owner)}`)
+                .send({ toEmail: recipient.email, boardId: board._id });
+
+            expect(response.status).toBe(200);
+            expect(consoleErrorSpy).toHaveBeenCalledWith(
+                'Failed to create invite notification:',
+                'notification failed',
+            );
+
+            await expect(
+                Invite.countDocuments({ boardId: board._id, toId: recipient._id }),
+            ).resolves.toBe(1);
+        } finally {
+            consoleErrorSpy.mockRestore();
+        }
     });
 });
