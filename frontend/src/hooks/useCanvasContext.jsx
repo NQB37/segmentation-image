@@ -1,4 +1,4 @@
-import { createContext, useState, useContext, useEffect, useRef } from 'react';
+import { createContext, useState, useContext, useEffect, useRef, useCallback } from 'react';
 
 const CanvasContext = createContext();
 
@@ -54,7 +54,7 @@ export const CanvasProvider = ({ children }) => {
     };
 
     // load image
-    const handleLoadImage = (type, image) => {
+    const handleLoadImage = useCallback((type, image) => {
         if (!image) {
             // Clear the layer if no image is provided (e.g. annotation layer)
             if (type === 'annotation' && canvasRef.current) {
@@ -98,7 +98,7 @@ export const CanvasProvider = ({ children }) => {
             console.error(`Failed to load image for ${type}:`, image.slice(0, 50) + '...');
         };
         img.src = image;
-    };
+    }, []);
 
     //handle move
     const handleMove = () => {
