@@ -38,13 +38,24 @@ export const isPinching = (landmarks) => (
 
 export const getCursorPoint = (landmarks) => getLandmarkPoint(landmarks, INDEX_TIP);
 
+export const mirrorGesturePoint = (point) => {
+    if (!point) return null;
+
+    return {
+        ...point,
+        x: Number((1 - point.x).toFixed(6)),
+    };
+};
+
 export const mapHandGestureToCommand = ({ gestureName, landmarks }) => {
     if (!landmarks) return { type: HAND_COMMANDS.IDLE };
+
+    const point = mirrorGesturePoint(getCursorPoint(landmarks));
 
     if (isPinching(landmarks)) {
         return {
             type: HAND_COMMANDS.DRAW,
-            point: getCursorPoint(landmarks),
+            point,
         };
     }
 
@@ -55,7 +66,7 @@ export const mapHandGestureToCommand = ({ gestureName, landmarks }) => {
     if (gestureName === 'Closed_Fist') {
         return {
             type: HAND_COMMANDS.PAN,
-            point: getCursorPoint(landmarks),
+            point,
         };
     }
 
@@ -65,6 +76,6 @@ export const mapHandGestureToCommand = ({ gestureName, landmarks }) => {
 
     return {
         type: HAND_COMMANDS.CURSOR,
-        point: getCursorPoint(landmarks),
+        point,
     };
 };
