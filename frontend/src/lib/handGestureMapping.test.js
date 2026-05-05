@@ -3,6 +3,7 @@ import {
     HAND_COMMANDS,
     getCursorPoint,
     getPinchDistance,
+    getSingleHandZoomRatio,
     isPinching,
     mapHandGestureToCommand,
     mirrorGesturePoint,
@@ -20,10 +21,24 @@ assert.deepEqual(mirrorGesturePoint({ x: 0.13, y: 0.75, z: 0 }), {
 });
 assert.ok(getPinchDistance(landmarks) < 0.055);
 assert.equal(isPinching(landmarks), true);
+assert.equal(
+    getSingleHandZoomRatio({ y: 0.7 }, { y: 0.6 }),
+    1.25,
+);
+assert.equal(
+    getSingleHandZoomRatio({ y: 0.6 }, { y: 0.7 }),
+    0.75,
+);
+assert.equal(getSingleHandZoomRatio(null, { y: 0.7 }), null);
 
 assert.deepEqual(
     mapHandGestureToCommand({ gestureName: 'Open_Palm', landmarks }),
-    { type: HAND_COMMANDS.DRAW, point: { x: 0.87, y: 0.13, z: 0 } },
+    { type: HAND_COMMANDS.ZOOM, point: { x: 0.87, y: 0.13, z: 0 } },
+);
+
+assert.deepEqual(
+    mapHandGestureToCommand({ gestureName: 'Closed_Fist', landmarks }),
+    { type: HAND_COMMANDS.PAN, point: { x: 0.87, y: 0.13, z: 0 } },
 );
 
 const openLandmarks = landmarks.map((landmark) => ({ ...landmark }));
@@ -33,6 +48,11 @@ openLandmarks[8] = { x: 0.9, y: 0.9, z: 0 };
 assert.deepEqual(
     mapHandGestureToCommand({ gestureName: 'Closed_Fist', landmarks: openLandmarks }),
     { type: HAND_COMMANDS.PAN, point: { x: 0.1, y: 0.9, z: 0 } },
+);
+
+assert.deepEqual(
+    mapHandGestureToCommand({ gestureName: 'Victory', landmarks: openLandmarks }),
+    { type: HAND_COMMANDS.DRAW, point: { x: 0.1, y: 0.9, z: 0 } },
 );
 
 assert.deepEqual(

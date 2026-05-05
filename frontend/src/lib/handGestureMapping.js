@@ -10,6 +10,7 @@ export const HAND_COMMANDS = {
 const THUMB_TIP = 4;
 const INDEX_TIP = 8;
 const PINCH_THRESHOLD = 0.055;
+const SINGLE_HAND_ZOOM_SENSITIVITY = 2.5;
 
 export const getLandmarkPoint = (landmarks, index) => {
     const landmark = landmarks?.[index];
@@ -47,14 +48,31 @@ export const mirrorGesturePoint = (point) => {
     };
 };
 
+export const getSingleHandZoomRatio = (previousPoint, point) => {
+    if (!previousPoint || !point) return null;
+
+    const deltaY = previousPoint.y - point.y;
+    return Number(Math.max(
+        0.5,
+        Math.min(1.5, 1 + deltaY * SINGLE_HAND_ZOOM_SENSITIVITY),
+    ).toFixed(3));
+};
+
 export const mapHandGestureToCommand = ({ gestureName, landmarks }) => {
     if (!landmarks) return { type: HAND_COMMANDS.IDLE };
 
     const point = mirrorGesturePoint(getCursorPoint(landmarks));
 
+    if (gestureName === 'Closed_Fist') {
+        return {
+            type: HAND_COMMANDS.PAN,
+            point,
+        };
+    }
+
     if (isPinching(landmarks)) {
         return {
-            type: HAND_COMMANDS.DRAW,
+            type: HAND_COMMANDS.ZOOM,
             point,
         };
     }
@@ -63,9 +81,9 @@ export const mapHandGestureToCommand = ({ gestureName, landmarks }) => {
         return { type: HAND_COMMANDS.IDLE };
     }
 
-    if (gestureName === 'Closed_Fist') {
+    if (gestureName === 'Victory') {
         return {
-            type: HAND_COMMANDS.PAN,
+            type: HAND_COMMANDS.DRAW,
             point,
         };
     }

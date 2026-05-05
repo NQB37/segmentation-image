@@ -5,6 +5,7 @@ import {
 } from '@mediapipe/tasks-vision';
 import {
     HAND_COMMANDS,
+    getSingleHandZoomRatio,
     mapHandGestureToCommand,
 } from '../lib/handGestureMapping';
 
@@ -26,6 +27,7 @@ export const useHandGestureController = ({
     const previousCommandRef = useRef({ type: HAND_COMMANDS.IDLE });
     const previousPanPointRef = useRef(null);
     const previousZoomDistanceRef = useRef(null);
+    const previousSingleZoomPointRef = useRef(null);
     const commandHistoryRef = useRef([]);
 
     const [enabled, setEnabled] = useState(false);
@@ -96,15 +98,28 @@ export const useHandGestureController = ({
         onZoom(ratio);
     }, [onZoom]);
 
+    const dispatchSingleHandZoom = useCallback((point) => {
+        if (!point) return;
+
+        const previousPoint = previousSingleZoomPointRef.current;
+        previousSingleZoomPointRef.current = point;
+        const ratio = getSingleHandZoomRatio(previousPoint, point);
+
+        if (!ratio || (ratio > 0.98 && ratio < 1.02)) return;
+
+        onZoom(ratio);
+    }, [onZoom]);
+
     const dispatchCommand = useCallback((command, secondCommand) => {
         const previousCommand = previousCommandRef.current;
 
         if (
-            command.type === HAND_COMMANDS.DRAW &&
-            secondCommand?.type === HAND_COMMANDS.DRAW
+            command.type === HAND_COMMANDS.ZOOM &&
+            secondCommand?.type === HAND_COMMANDS.ZOOM
         ) {
             dispatchZoom(command.point, secondCommand.point);
             onDrawEnd();
+            previousSingleZoomPointRef.current = null;
             previousCommandRef.current = { type: HAND_COMMANDS.ZOOM };
             return;
         }
@@ -113,6 +128,7 @@ export const useHandGestureController = ({
 
         if (command.type === HAND_COMMANDS.DRAW) {
             previousPanPointRef.current = null;
+            previousSingleZoomPointRef.current = null;
             if (previousCommand.type !== HAND_COMMANDS.DRAW) {
                 onDrawStart(command.point);
             } else {
@@ -120,18 +136,26 @@ export const useHandGestureController = ({
             }
         } else if (command.type === HAND_COMMANDS.PAN) {
             onDrawEnd();
+            previousSingleZoomPointRef.current = null;
             dispatchPan(command.point);
+        } else if (command.type === HAND_COMMANDS.ZOOM) {
+            onDrawEnd();
+            previousPanPointRef.current = null;
+            dispatchSingleHandZoom(command.point);
         } else if (command.type === HAND_COMMANDS.TOGGLE_TOOL) {
             onDrawEnd();
+            previousSingleZoomPointRef.current = null;
             onToolToggle();
         } else {
             onDrawEnd();
             previousPanPointRef.current = null;
+            previousSingleZoomPointRef.current = null;
         }
 
         previousCommandRef.current = command;
     }, [
         dispatchPan,
+        dispatchSingleHandZoom,
         dispatchZoom,
         onDrawEnd,
         onDrawMove,
@@ -154,6 +178,7 @@ export const useHandGestureController = ({
         previousCommandRef.current = { type: HAND_COMMANDS.IDLE };
         previousPanPointRef.current = null;
         previousZoomDistanceRef.current = null;
+        previousSingleZoomPointRef.current = null;
         commandHistoryRef.current = [];
         onDrawEnd();
         onCursor(null);
