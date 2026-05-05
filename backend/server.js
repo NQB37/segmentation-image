@@ -1,4 +1,4 @@
-import env from './config/environement.js';
+import env from './config/environment.js';
 import mongoose from 'mongoose';
 import app from './app.js';
 import dns from 'dns';

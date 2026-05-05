@@ -1,4 +1,4 @@
-import env from './environement.js';
+import env from './environment.js';
 
 const corsOptions = {
   origin: env.CLIENT_URL,

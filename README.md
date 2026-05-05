@@ -9,6 +9,7 @@ Segmentation Image is a full-stack web application for creating image annotation
 - User signup, login, profile updates, avatar changes, and password changes.
 - Project boards for uploaded source images.
 - Canvas annotation tools with brush, eraser, zoom, pan, and visibility controls.
+- MediaPipe hand gesture control for canvas drawing (Victory pose), panning, and zooming (pinch up/down).
 - Label management for annotation colors.
 - Owner/member board permissions.
 - Member invitations with persistent and real-time notifications.
@@ -19,7 +20,7 @@ Segmentation Image is a full-stack web application for creating image annotation
 
 | Layer | Technologies |
 | --- | --- |
-| Frontend | React, Vite, React Router, Zustand, Tailwind CSS, Radix UI, Fabric.js, TensorFlow.js, Socket.IO Client |
+| Frontend | React, Vite, React Router, Zustand, Tailwind CSS, Radix UI, Fabric.js, TensorFlow.js, MediaPipe, Socket.IO Client |
 | Backend | Node.js, Express, Mongoose, MongoDB, JWT, Socket.IO |
 | Testing | Jest, Supertest, in-memory model helpers for backend service/controller tests |
 
