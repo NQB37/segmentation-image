@@ -1,4 +1,10 @@
-import { createContext, useState, useContext, useEffect, useRef, useCallback } from 'react';
+import { createContext, useState, useContext, useRef, useCallback } from 'react';
+import {
+    clampScale,
+    getCanvasPoint,
+    getCanvasPointFromNormalizedPoint,
+    getTransformOrigin,
+} from '../lib/canvasViewport';
 
 const CanvasContext = createContext();
 
@@ -30,21 +36,7 @@ export const CanvasProvider = ({ children }) => {
     const [origin, setOrigin] = useState({ x: 0, y: 0 });
     const [totalDrawnLength, setTotalDrawnLength] = useState(0);
     const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
-
-    useEffect(() => {
-        const container = containerRef.current;
-        if (container) {
-            container.addEventListener('wheel', handleWheelZoom, {
-                passive: false,
-            });
-        }
-
-        return () => {
-            if (container) {
-                container.removeEventListener('wheel', handleWheelZoom);
-            }
-        };
-    }, [scale]);
+    const [gestureCursorPoint, setGestureCursorPoint] = useState(null);
 
     const resetBtn = () => {
         setMoveSelected(false);
@@ -144,7 +136,10 @@ export const CanvasProvider = ({ children }) => {
     const startPan = (e) => {
         if (moveSelected) {
             setStartPos({ x: e.clientX, y: e.clientY });
-            containerRef.current.style.cursor = 'grab';
+            e.currentTarget?.setPointerCapture?.(e.pointerId);
+            if (containerRef.current) {
+                containerRef.current.style.cursor = 'grab';
+            }
         }
     };
 
@@ -163,26 +158,24 @@ export const CanvasProvider = ({ children }) => {
         }
     };
 
-    const endPan = () => {
+    const endPan = (e) => {
+        if (e?.currentTarget?.hasPointerCapture?.(e.pointerId)) {
+            e.currentTarget.releasePointerCapture(e.pointerId);
+        }
         setStartPos(null);
-        containerRef.current.style.cursor = 'default';
+        if (containerRef.current) {
+            containerRef.current.style.cursor = 'default';
+        }
     };
 
     // handle draw
     const getMousePosition = (e) => {
-        const canvas = canvasRef.current;
-        if (!canvas) return { x: 0, y: 0 };
-        const rect = canvas.getBoundingClientRect();
-        
-        // Account for the ratio between internal resolution and CSS display size
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-
-        return {
-            x: (e.clientX - rect.left) * scaleX,
-            y: (e.clientY - rect.top) * scaleY,
-        };
+        return getCanvasPoint(e, canvasRef.current);
     };
+
+    const getGestureCanvasPoint = (point) => (
+        getCanvasPointFromNormalizedPoint(point, canvasRef.current)
+    );
 
     const startDrawing = (e) => {
         if (brushSelected || eraserSelected) {
@@ -229,6 +222,70 @@ export const CanvasProvider = ({ children }) => {
             ctx.closePath();
             setLastPos(null);
         }
+    };
+
+    const startGestureStroke = (point) => {
+        if (!canvasRef.current || (!brushSelected && !eraserSelected)) return;
+
+        const ctx = canvasRef.current.getContext('2d');
+        const canvasPoint = getGestureCanvasPoint(point);
+
+        if (eraserSelected) {
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.lineWidth = eraserSize;
+        }
+
+        if (brushSelected) {
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.strokeStyle = color;
+            ctx.lineWidth = brushSize;
+        }
+
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        ctx.moveTo(canvasPoint.x, canvasPoint.y);
+        setIsDrawing(true);
+        setTotalDrawnLength(0);
+        setLastPos(canvasPoint);
+    };
+
+    const moveGestureStroke = (point) => {
+        if (!isDrawing || !canvasRef.current) return;
+
+        const ctx = canvasRef.current.getContext('2d');
+        const canvasPoint = getGestureCanvasPoint(point);
+
+        if (lastPos) {
+            const dx = canvasPoint.x - lastPos.x;
+            const dy = canvasPoint.y - lastPos.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            setTotalDrawnLength((prevLength) => prevLength + distance);
+        }
+
+        ctx.lineTo(canvasPoint.x, canvasPoint.y);
+        ctx.stroke();
+        setLastPos(canvasPoint);
+    };
+
+    const endGestureStroke = () => {
+        if (!isDrawing || !canvasRef.current) return;
+
+        const ctx = canvasRef.current.getContext('2d');
+        ctx.closePath();
+        setIsDrawing(false);
+        setLastPos(null);
+    };
+
+    const panByGestureDelta = ({ dx, dy }) => {
+        setPos((currentPos) => ({
+            x: currentPos.x + dx,
+            y: currentPos.y + dy,
+        }));
+    };
+
+    const zoomByGestureRatio = (ratio) => {
+        setScale((currentScale) => clampScale(currentScale * ratio));
     };
 
     // handle fill
@@ -299,17 +356,8 @@ export const CanvasProvider = ({ children }) => {
     const handleWheelZoom = (e) => {
         e.preventDefault();
         const zoomSpeed = 0.005;
-        let newScale = scale - e.deltaY * zoomSpeed;
-        newScale = Math.min(Math.max(newScale, 1), 10);
-
-        const rect = canvasRef.current.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-
-        const newOriginX = (mouseX / rect.width) * 100;
-        const newOriginY = (mouseY / rect.height) * 100;
-        setOrigin({ x: newOriginX, y: newOriginY });
-
+        const newScale = clampScale(scale - e.deltaY * zoomSpeed);
+        setOrigin(getTransformOrigin(e, containerRef.current));
         setScale(newScale);
     };
 
@@ -336,11 +384,7 @@ export const CanvasProvider = ({ children }) => {
         const newColor = e.target ? e.target.value : e;
         setColor(newColor);
         
-        // UX improvement: if a drawing tool is not selected, select the brush
         if (!brushSelected && !fillSelected && !eraserSelected) {
-            handleBrush();
-            // Re-call handleBrush might be tricky if it uses the old 'color' state
-            // Let's manually set it to be safe
             resetBtn();
             setBrushSelected(true);
         }
@@ -384,6 +428,7 @@ export const CanvasProvider = ({ children }) => {
                 scale,
                 origin,
                 canvasSize,
+                gestureCursorPoint,
                 labels,
                 annotationToggle,
                 maskToggle,
@@ -402,6 +447,12 @@ export const CanvasProvider = ({ children }) => {
                 startDrawing,
                 draw,
                 endDrawing,
+                startGestureStroke,
+                moveGestureStroke,
+                endGestureStroke,
+                panByGestureDelta,
+                zoomByGestureRatio,
+                setGestureCursorPoint,
                 hexToRGBA,
                 fillArea,
                 handleZoomChange,

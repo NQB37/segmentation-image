@@ -6,7 +6,7 @@ import { Microscope } from 'lucide-react';
 
 const Header = () => {
   return (
-    <header className='sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80'>
+    <header className='sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80'>
       <div className='container mx-auto flex h-16 items-center justify-between'>
         <Link
           to='/board'

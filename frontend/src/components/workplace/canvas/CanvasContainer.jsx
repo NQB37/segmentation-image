@@ -1,13 +1,18 @@
 import { useEffect } from "react";
 import { useCanvasContext } from "../../../hooks/useCanvasContext";
+import {
+  getGestureCursorStyle,
+  getViewportTransform,
+} from "../../../lib/canvasViewport";
 import { Badge } from "../../ui/badge";
 
 const CanvasContainer = () => {
   const {
     containerRef, bgCanvasRef, canvasRef, maskCanvasRef,
-    scale, pos, totalDrawnLength, canvasSize,
+    scale, pos, origin, totalDrawnLength, canvasSize,
     startPan, pan, endPan, handleWheelZoom, handleCanvasClick,
     startDrawing, draw, endDrawing, annotationToggle, maskToggle,
+    gestureCursorPoint,
   } = useCanvasContext();
 
   useEffect(() => {
@@ -26,17 +31,18 @@ const CanvasContainer = () => {
   return (
     <div
       className="relative w-full h-full overflow-hidden cursor-crosshair flex items-center justify-center bg-slate-900/5"
-      onMouseDown={startPan}
-      onMouseMove={pan}
-      onMouseUp={endPan}
-      onMouseLeave={endPan}
+      onPointerDown={startPan}
+      onPointerMove={pan}
+      onPointerUp={endPan}
+      onPointerCancel={endPan}
     >
       <div
         ref={containerRef}
         onWheel={handleWheelZoom}
         className="relative transition-transform duration-75 ease-out shadow-2xl bg-white"
         style={{
-          transform: `scale(${scale}) translate(${pos.x}px, ${pos.y}px)`,
+          transform: getViewportTransform(pos, scale),
+          transformOrigin: `${origin.x}% ${origin.y}%`,
           aspectRatio: canvasSize.width > 0 ? `${canvasSize.width} / ${canvasSize.height}` : 'auto',
           width: canvasSize.width > 0 ? 'auto' : '100%',
           height: canvasSize.height > 0 ? 'auto' : '100%',
@@ -55,6 +61,13 @@ const CanvasContainer = () => {
           onMouseUp={endDrawing}
           onMouseLeave={endDrawing}
         />
+        {gestureCursorPoint && (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute z-30 size-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-background bg-primary shadow-lg ring-2 ring-primary/30"
+            style={getGestureCursorStyle(gestureCursorPoint)}
+          />
+        )}
       </div>
       
       <div className="absolute right-4 bottom-4 z-30">

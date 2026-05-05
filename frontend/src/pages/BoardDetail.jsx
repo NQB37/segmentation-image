@@ -2,6 +2,7 @@ import Header from "../components/Share/Header";
 import ToolPropertiesBar from "../components/workplace/toolbox/ToolPropertiesBar";
 import ToolboxContainer from "../components/workplace/toolbox/ToolboxContainer";
 import CanvasContainer from "../components/workplace/canvas/CanvasContainer";
+import CameraGesturePanel from "../components/workplace/gesture/CameraGesturePanel";
 import WorkspaceSidebar from "../components/workplace/WorkspaceSidebar";
 import { useParams } from "react-router-dom";
 import useFetch from "../hooks/useFetch";
@@ -46,6 +47,7 @@ const BoardDetailPage = () => {
         <ToolboxContainer />
         <main className="flex-grow relative bg-slate-50 overflow-hidden">
           <CanvasContainer />
+          <CameraGesturePanel />
         </main>
         <WorkspaceSidebar isOwner={isOwner} />
       </div>

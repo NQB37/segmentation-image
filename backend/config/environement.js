@@ -1,9 +1,10 @@
 import dotenv from 'dotenv';
 
-const envPath =
-  process.env.NODE_ENV === 'development' ? '.env' : '.env.production';
+// const envPath =
+//   process.env.NODE_ENV === 'development' ? '.env' : '.env.production';
 
-dotenv.config({ path: envPath });
+// dotenv.config({ path: envPath });
+dotenv.config();
 
 export default {
   MONGO_URI: process.env.MONGO_URI,
