@@ -10,11 +10,18 @@ Segmentation Image is a full-stack web application for creating image annotation
 - Project boards for uploaded source images.
 - Canvas annotation tools with brush, eraser, zoom, pan, and visibility controls.
 - MediaPipe hand gesture control for canvas drawing (Victory pose), panning, and zooming (pinch up/down).
+- Client-side nuclei segmentation using TensorFlow.js (U-Net model).
 - Label management for annotation colors.
 - Owner/member board permissions.
 - Member invitations with persistent and real-time notifications.
 - Annotation and segmentation image fields stored with each board.
 - TensorFlow.js model assets included under `frontend/public/unet/`.
+
+## Sample Nuclei Segmentation
+
+| Original Image | Segmentation Mask |
+| :---: | :---: |
+| <img src="./image.png" width="400" alt="Original Image" /> | <img src="./mask.png" width="400" alt="Segmentation Mask" /> |
 
 ## Tech Stack
 
