@@ -20,6 +20,7 @@ import { saveAs } from 'file-saver';
 import { useRef } from 'react';
 import * as tf from '@tensorflow/tfjs';
 import { loadSegmentationModel, runSegmentation } from '../../../lib/segmentationModel';
+import { addCanvasZipEntries, getCanvasZipEntries } from '../../../lib/canvasDownload';
 
 const ToolboxContainer = () => {
   const {
@@ -65,13 +66,7 @@ const ToolboxContainer = () => {
     const zip = new JSZip();
     const imageCanvas = bgCanvasRef.current;
     const canvasCanvas = canvasRef.current;
-
-    zip.file('image.png', imageCanvas.toDataURL('image/png').split(',')[1], {
-      base64: true,
-    });
-    zip.file('label.png', canvasCanvas.toDataURL('image/png').split(',')[1], {
-      base64: true,
-    });
+    const maskCanvas = maskCanvasRef.current;
 
     const combinedCanvas = document.createElement('canvas');
     combinedCanvas.width = imageCanvas.width;
@@ -79,10 +74,15 @@ const ToolboxContainer = () => {
     const ctx = combinedCanvas.getContext('2d');
     ctx.drawImage(imageCanvas, 0, 0);
     ctx.drawImage(canvasCanvas, 0, 0);
-    zip.file(
-      'combined.png',
-      combinedCanvas.toDataURL('image/png').split(',')[1],
-      { base64: true },
+
+    addCanvasZipEntries(
+      zip,
+      getCanvasZipEntries({
+        imageCanvas,
+        annotationCanvas: canvasCanvas,
+        maskCanvas,
+        combinedCanvas,
+      }),
     );
 
     const blob = await zip.generateAsync({ type: 'blob' });
