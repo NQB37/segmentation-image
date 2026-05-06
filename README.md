@@ -2,7 +2,7 @@
 
 Segmentation Image is a full-stack web application for creating image annotation projects, managing labels and collaborators, and saving canvas-based segmentation work. The app combines a React/Vite frontend with an Express/MongoDB backend and real-time notifications over Socket.IO.
 
-**Live Demo:** [cellseg.nqb37.com](https://cellseg.nqb37.com)
+**Live Demo:** [cellseg.nqb37.live](https://cellseg.nqb37.live)
 
 ## Features
 
@@ -19,17 +19,17 @@ Segmentation Image is a full-stack web application for creating image annotation
 
 ## Sample Nuclei Segmentation
 
-| Original Image | Segmentation Mask |
-| :---: | :---: |
+|                       Original Image                       |                      Segmentation Mask                       |
+| :--------------------------------------------------------: | :----------------------------------------------------------: |
 | <img src="./image.png" width="400" alt="Original Image" /> | <img src="./mask.png" width="400" alt="Segmentation Mask" /> |
 
 ## Tech Stack
 
-| Layer | Technologies |
-| --- | --- |
+| Layer    | Technologies                                                                                                      |
+| -------- | ----------------------------------------------------------------------------------------------------------------- |
 | Frontend | React, Vite, React Router, Zustand, Tailwind CSS, Radix UI, Fabric.js, TensorFlow.js, MediaPipe, Socket.IO Client |
-| Backend | Node.js, Express, Mongoose, MongoDB, JWT, Socket.IO |
-| Testing | Jest, Supertest, in-memory model helpers for backend service/controller tests |
+| Backend  | Node.js, Express, Mongoose, MongoDB, JWT, Socket.IO                                                               |
+| Testing  | Jest, Supertest, in-memory model helpers for backend service/controller tests                                     |
 
 ## Repository Structure
 
@@ -125,33 +125,33 @@ Open the Vite URL printed by the frontend command, usually `http://localhost:517
 
 ### Backend
 
-| Command | Description |
-| --- | --- |
-| `npm run dev` | Start the API with Nodemon. |
-| `npm start` | Start the API with Node. |
-| `npm test` | Run the Jest backend test suite. |
+| Command              | Description                      |
+| -------------------- | -------------------------------- |
+| `npm run dev`        | Start the API with Nodemon.      |
+| `npm start`          | Start the API with Node.         |
+| `npm test`           | Run the Jest backend test suite. |
 | `npm run test:watch` | Run backend tests in watch mode. |
-| `npm run lint` | Run ESLint for backend files. |
+| `npm run lint`       | Run ESLint for backend files.    |
 
 ### Frontend
 
-| Command | Description |
-| --- | --- |
-| `npm run dev` | Start the Vite development server. |
-| `npm run build` | Build the frontend for production. |
+| Command           | Description                           |
+| ----------------- | ------------------------------------- |
+| `npm run dev`     | Start the Vite development server.    |
+| `npm run build`   | Build the frontend for production.    |
 | `npm run preview` | Preview the production build locally. |
-| `npm run lint` | Run ESLint for frontend files. |
+| `npm run lint`    | Run ESLint for frontend files.        |
 
 ## API Overview
 
 The backend mounts routes under these base paths:
 
-| Base Path | Purpose |
-| --- | --- |
-| `/api/userRoute` | Authentication and profile management. |
-| `/api/boardRoute` | Board CRUD, annotation updates, labels, members, and board leave/delete actions. |
-| `/api/inviteRoute` | Board invitation listing, creation, acceptance, and cancellation. |
-| `/api/notificationRoute` | Notification listing, unread counts, read status, and deletion. |
+| Base Path                | Purpose                                                                          |
+| ------------------------ | -------------------------------------------------------------------------------- |
+| `/api/userRoute`         | Authentication and profile management.                                           |
+| `/api/boardRoute`        | Board CRUD, annotation updates, labels, members, and board leave/delete actions. |
+| `/api/inviteRoute`       | Board invitation listing, creation, acceptance, and cancellation.                |
+| `/api/notificationRoute` | Notification listing, unread counts, read status, and deletion.                  |
 
 Most routes require a bearer token:
 
