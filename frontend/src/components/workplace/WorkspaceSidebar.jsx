@@ -1,6 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import LabelContainer from "./label/LabelContainer";
 import MemberContainer from "./member/MemberContainer";
+import SegmentPanel from "./segmentation/SegmentPanel";
 import { useLabelStore } from "../../stores/useLabelStore";
 import { useMemberStore } from "../../stores/useMemberStore";
 import { useAuthStore } from "../../stores/useAuthStore";
@@ -20,6 +21,9 @@ const WorkspaceSidebar = ({ isOwner }) => {
           <TabsTrigger value="members" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none shadow-none">
             Members
           </TabsTrigger>
+          <TabsTrigger value="segment" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none shadow-none">
+            Segment
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="labels" className="flex-grow overflow-hidden m-0">
           <LabelContainer labels={labels} isOwner={isOwner} />
@@ -29,6 +33,9 @@ const WorkspaceSidebar = ({ isOwner }) => {
             members={members.filter(member => member.email !== user?.email)} 
             isOwner={isOwner}
           />
+        </TabsContent>
+        <TabsContent value="segment" className="flex-grow overflow-hidden m-0">
+          <SegmentPanel />
         </TabsContent>
       </Tabs>
     </div>

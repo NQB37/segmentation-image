@@ -402,9 +402,20 @@ export const CanvasProvider = ({ children }) => {
 
     // segmentation
     const [maskToggle, setMaskToggle] = useState(false);
+    const [segmentationPreview, setSegmentationPreview] = useState('');
+    const [isSegmenting, setIsSegmenting] = useState(false);
     const handleMaskToggle = () => {
         setMaskToggle((value) => !value);
     };
+    const clearSegmentation = useCallback(() => {
+        if (maskCanvasRef.current) {
+            const ctx = maskCanvasRef.current.getContext('2d');
+            ctx.clearRect(0, 0, maskCanvasRef.current.width, maskCanvasRef.current.height);
+        }
+
+        setSegmentationPreview('');
+        setMaskToggle(false);
+    }, []);
 
     return (
         <CanvasContext.Provider
@@ -432,6 +443,8 @@ export const CanvasProvider = ({ children }) => {
                 labels,
                 annotationToggle,
                 maskToggle,
+                segmentationPreview,
+                isSegmenting,
                 resetBtn,
                 handleLoadImage,
                 handleMove,
@@ -462,6 +475,10 @@ export const CanvasProvider = ({ children }) => {
                 handleColorChange,
                 handleAnnotationToggle,
                 handleMaskToggle,
+                setMaskToggle,
+                setSegmentationPreview,
+                setIsSegmenting,
+                clearSegmentation,
             }}
         >
             {children}

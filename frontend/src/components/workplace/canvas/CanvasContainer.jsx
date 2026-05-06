@@ -51,7 +51,7 @@ const CanvasContainer = () => {
         }}
       >
         <canvas ref={bgCanvasRef} className="z-0 block w-full h-full" />
-        <canvas ref={maskCanvasRef} className={`z-10 absolute inset-0 size-full opacity-25 ${maskToggle ? '' : 'hidden'}`} />
+        <canvas ref={maskCanvasRef} className={`z-10 absolute inset-0 size-full ${maskToggle ? '' : 'hidden'}`} />
         <canvas
           ref={canvasRef}
           className={`z-20 absolute inset-0 size-full ${annotationToggle ? "" : "hidden"}`}
